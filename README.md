@@ -4,13 +4,14 @@
 [ ![Download Nightly](https://api.bintray.com/packages/gauge/Gauge/Nightly/images/download.svg) ](https://bintray.com/gauge/Gauge/Nightly/_latestVersion)
 [![Build Status](https://travis-ci.org/getgauge/gauge.svg?branch=master)](https://travis-ci.org/getgauge/gauge)
 [![Build status](https://ci.appveyor.com/api/projects/status/w9rjq31rqnru66fi?svg=true)](https://ci.appveyor.com/project/getgauge/gauge)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 # Welcome to Gauge
 
 Gauge is a light weight cross-platform test automation tool. It provides the ability to author test cases in the business language.
 
 ## Get Started
-Read more about [Why Gauge](https://docs.gauge.org/longstart.html#why-gauge) can be used, its [terminologies](https://docs.gauge.org/longstart.html#gauge-terminologies) and [**get started...**](https://gauge.org/get-started.html)
+Read more about [Why Gauge](https://blog.getgauge.io/why-we-built-gauge-6e31bb4848cd) can be used, its [terminologies](https://docs.gauge.org/latest/writing-specifications.html) and [**get started...**](https://gauge.org/getting-started-guide/we-start/)
 
 ## Find out more
 
@@ -23,7 +24,7 @@ Read more about [Why Gauge](https://docs.gauge.org/longstart.html#why-gauge) can
 [examples-image]:https://d3i6fms1cm1j0i.cloudfront.net/github/images/roadmap.png
 [contributing-image]:https://d3i6fms1cm1j0i.cloudfront.net/github/images/contributing.png
 
-[userdocs]:https://docs.gauge.org
+[userdocs]:https://docs.gauge.org/latest
 [get-started]:https://github.com/getgauge/gauge/wiki/Setup
 [examples]:https://getgauge-examples.github.io/
 [contributing]:CONTRIBUTING.md
@@ -31,7 +32,7 @@ Read more about [Why Gauge](https://docs.gauge.org/longstart.html#why-gauge) can
 ## Questions or need help?
 
 ### Troubleshooting
-Refer our [Troubleshooting](https://docs.gauge.org/troubleshooting.html) guide.
+Context specific **Troubleshooting** guide is available in relevant pages of the [Gauge Documentation](https://docs.gauge.org/latest).
 
 ### Talk to us
 
@@ -43,6 +44,12 @@ Please see below for the best place to ask a query:
 - I have an idea/request -- file an [issue](https://github.com/getgauge/gauge/issues)
 - Why do you? -- [Google Groups](https://groups.google.com/forum/#!forum/getgauge)
 - When will you? -- [Google Groups](https://groups.google.com/forum/#!forum/getgauge)
+
+### Other projects
+
+Also maintained by Gauge
+
+- [Taiko](https://github.com/getgauge/taiko) Headless web browser automation.
 
 ## Add Gauge Badge to your project!
 Copy the text below and add it to the README.md of your project using Gauge, and show your support. It looks like this:
@@ -60,4 +67,4 @@ Gauge is released under [GNU Public License version 3.0](http://www.gnu.org/lice
 
 ## Copyright
 
-Copyright 2017 ThoughtWorks, Inc.
+Copyright 2018 ThoughtWorks, Inc.

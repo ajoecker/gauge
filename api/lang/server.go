@@ -19,12 +19,10 @@ package lang
 
 import (
 	"context"
-	"log"
-	"runtime/debug"
-
-	"os"
-
 	"encoding/json"
+	"log"
+	"os"
+	"runtime/debug"
 
 	"github.com/getgauge/gauge/api/infoGatherer"
 	"github.com/getgauge/gauge/execution"
@@ -35,13 +33,14 @@ import (
 
 type infoProvider interface {
 	Init()
-	Steps() []*gauge.Step
-	AllSteps() []*gauge.Step
+	Steps(filterConcepts bool) []*gauge.Step
+	AllSteps(filterConcepts bool) []*gauge.Step
 	Concepts() []*gm.ConceptInfo
 	Params(file string, argType gauge.ArgType) []gauge.StepArg
 	Tags() []string
 	SearchConceptDictionary(string) *gauge.Concept
 	GetAvailableSpecDetails(specs []string) []*infoGatherer.SpecDetail
+	GetSpecDirs() []string
 }
 
 var provider infoProvider
@@ -74,6 +73,7 @@ func (h *LangHandler) handle(ctx context.Context, conn *jsonrpc2.Conn, req *json
 func (h *LangHandler) Handle(ctx context.Context, conn jsonrpc2.JSONRPC2, req *jsonrpc2.Request) (interface{}, error) {
 	switch req.Method {
 	case "initialize":
+		informRunnerCompatibility(ctx, conn)
 		if err := cacheInitializeParams(req); err != nil {
 			logError(req, err.Error())
 			return nil, err
@@ -81,6 +81,7 @@ func (h *LangHandler) Handle(ctx context.Context, conn jsonrpc2.JSONRPC2, req *j
 		return gaugeLSPCapabilities(), nil
 	case "initialized":
 		registerFileWatcher(conn, ctx)
+		notifyTelemetry(ctx, conn)
 		err := registerRunnerCapabilities(conn, ctx)
 		if err != nil {
 			logError(req, err.Error())
@@ -221,7 +222,7 @@ func (h *LangHandler) Handle(ctx context.Context, conn jsonrpc2.JSONRPC2, req *j
 		}
 		return val, err
 	case "gauge/executionStatus":
-		val, err := execution.ReadExecutionStatus()
+		val, err := execution.ReadLastExecutionResult()
 		if err != nil {
 			logDebug(req, err.Error())
 		}
@@ -234,6 +235,8 @@ func (h *LangHandler) Handle(ctx context.Context, conn jsonrpc2.JSONRPC2, req *j
 		return generateConcept(req)
 	case "gauge/getRunnerLanguage":
 		return lRunner.lspID, nil
+	case "gauge/specDirs":
+		return provider.GetSpecDirs(), nil
 	default:
 		return nil, nil
 	}

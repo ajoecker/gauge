@@ -60,6 +60,27 @@ func (specResult *SpecResult) AddScenarioResults(scenarioResults []Result) {
 	specResult.ScenarioCount += len(scenarioResults)
 }
 
+func (specResult *SpecResult) AddTableDrivenScenarioResult(r *ScenarioResult, t *gauge_messages.ProtoTable, scenarioRowIndex int, specRowIndex int, specTableDriven bool) {
+	if r.GetFailed() {
+		specResult.IsFailed = true
+		specResult.ScenarioFailedCount++
+	}
+	specResult.AddExecTime(r.ExecTime())
+	pItem := &gauge_messages.ProtoItem{
+		ItemType: gauge_messages.ProtoItem_TableDrivenScenario,
+		TableDrivenScenario: &gauge_messages.ProtoTableDrivenScenario{
+			Scenario:              r.Item().(*gauge_messages.ProtoScenario),
+			IsScenarioTableDriven: true,
+			ScenarioTableRowIndex: int32(scenarioRowIndex),
+			IsSpecTableDriven:     specTableDriven,
+			ScenarioDataTable:     t,
+			TableRowIndex:         int32(specRowIndex),
+			ScenarioTableRow:      r.ScenarioDataTableRow,
+		},
+	}
+	specResult.ProtoSpec.Items = append(specResult.ProtoSpec.Items, pItem)
+}
+
 // AddTableRelatedScenarioResult aggregates the data table driven spec results.
 func (specResult *SpecResult) AddTableRelatedScenarioResult(scenarioResults [][]Result, index int) {
 	numberOfScenarios := len(scenarioResults[0])
@@ -73,7 +94,11 @@ func (specResult *SpecResult) AddTableRelatedScenarioResult(scenarioResults [][]
 				scenarioFailed = true
 				specResult.FailedDataTableRows = append(specResult.FailedDataTableRows, int32(index))
 			}
-			protoTableDrivenScenario := &gauge_messages.ProtoTableDrivenScenario{Scenario: protoScenario, TableRowIndex: int32(index)}
+			protoTableDrivenScenario := &gauge_messages.ProtoTableDrivenScenario{
+				Scenario:         protoScenario,
+				TableRowIndex:    int32(index),
+				ScenarioTableRow: eachRow[scenarioIndex].(*ScenarioResult).ScenarioDataTableRow,
+			}
 			protoItem := &gauge_messages.ProtoItem{ItemType: gauge_messages.ProtoItem_TableDrivenScenario, TableDrivenScenario: protoTableDrivenScenario}
 			specResult.ProtoSpec.Items = append(specResult.ProtoSpec.Items, protoItem)
 		}

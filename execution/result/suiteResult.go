@@ -28,20 +28,22 @@ import (
 
 // SuitResult represents the result of suit execution
 type SuiteResult struct {
-	SpecResults       []*SpecResult
-	PreSuite          *(gauge_messages.ProtoHookFailure)
-	PostSuite         *(gauge_messages.ProtoHookFailure)
-	IsFailed          bool
-	SpecsFailedCount  int
-	ExecutionTime     int64 //in milliseconds
-	UnhandledErrors   []error
-	Environment       string
-	Tags              string
-	ProjectName       string
-	Timestamp         string
-	SpecsSkippedCount int
-	PreHookMessages   []string
-	PostHookMessages  []string
+	SpecResults         []*SpecResult
+	PreSuite            *(gauge_messages.ProtoHookFailure)
+	PostSuite           *(gauge_messages.ProtoHookFailure)
+	IsFailed            bool
+	SpecsFailedCount    int
+	ExecutionTime       int64 //in milliseconds
+	UnhandledErrors     []error
+	Environment         string
+	Tags                string
+	ProjectName         string
+	Timestamp           string
+	SpecsSkippedCount   int
+	PreHookMessages     []string
+	PostHookMessages    []string
+	PreHookScreenshots  [][]byte
+	PostHookScreenshots [][]byte
 }
 
 // NewSuiteResult is a constructor for SuitResult
@@ -50,7 +52,7 @@ func NewSuiteResult(tags string, startTime time.Time) *SuiteResult {
 	result.SpecResults = make([]*SpecResult, 0)
 	result.Timestamp = startTime.Format(config.LayoutForTimeStamp)
 	result.ProjectName = filepath.Base(config.ProjectRoot)
-	result.Environment = env.CurrentEnv()
+	result.Environment = env.CurrentEnvironments()
 	result.Tags = tags
 	return result
 }

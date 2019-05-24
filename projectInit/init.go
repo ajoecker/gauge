@@ -38,7 +38,9 @@ type templateMetadata struct {
 func initializeTemplate(templateName string) error {
 	tempDir := common.GetTempDir()
 	defer util.Remove(tempDir)
-	unzippedTemplate, err := util.DownloadAndUnzip(getTemplateURL(templateName), tempDir)
+	templateURL := getTemplateURL(templateName)
+	logger.Debugf(true, "Initializing template from %s", templateURL)
+	unzippedTemplate, err := util.DownloadAndUnzip(templateURL, tempDir)
 	if err != nil {
 		return err
 	}
@@ -71,6 +73,7 @@ func initializeTemplate(templateName string) error {
 	}
 
 	if metadata.PostInstallCmd != "" {
+		logger.Debugf(true, "Running post install command %s", metadata.PostInstallCmd)
 		command := strings.Fields(metadata.PostInstallCmd)
 		cmd, err := common.ExecuteSystemCommand(command, wd, os.Stdout, os.Stderr)
 		if err != nil {
@@ -84,7 +87,7 @@ func initializeTemplate(templateName string) error {
 			return err
 		}
 	}
-	fmt.Printf("Successfully initialized the project. %s\n", metadata.PostInstallMsg)
+	logger.Infof(true, "Successfully initialized the project. %s\n", metadata.PostInstallMsg)
 
 	util.Remove(metadataFile)
 	return nil
@@ -107,17 +110,17 @@ func isGaugeProject() bool {
 	return m.Language != ""
 }
 
-func installRunner(templateName string) {
+func installRunner(templateName string, silent bool) {
 	language := getTemplateLanguage(templateName)
 	if !install.IsCompatiblePluginInstalled(language, true) {
 		logger.Infof(true, "Compatible language plugin %s is not installed. Installing plugin...", language)
 
-		install.HandleInstallResult(install.Plugin(language, ""), language, true)
+		install.HandleInstallResult(install.Plugin(language, "", silent), language, true)
 	}
 }
 
 // InitializeProject initializes a Gauge project with specified template
-func InitializeProject(templateName string) {
+func InitializeProject(templateName string, silent bool) {
 	wd, err := os.Getwd()
 	if err != nil {
 		logger.Fatalf(true, "Failed to find working directory. %s", err.Error())
@@ -129,9 +132,9 @@ func InitializeProject(templateName string) {
 	exists, _ := common.UrlExists(getTemplateURL(templateName))
 	if exists {
 		err = initializeTemplate(templateName)
-		installRunner(templateName)
+		installRunner(templateName, silent)
 	} else {
-		installRunner(templateName)
+		installRunner(templateName, silent)
 		err = createProjectTemplate(templateName)
 	}
 	if err != nil {

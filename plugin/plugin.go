@@ -42,52 +42,50 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-const (
-	executionScope          = "execution"
-	docScope                = "documentation"
-	pluginConnectionPortEnv = "plugin_connection_port"
-	debugEnv                = "debugging"
-)
+type pluginScope string
 
-type pluginDescriptor struct {
-	ID          string
-	Version     string
-	Name        string
-	Description string
-	Command     struct {
-		Windows []string
-		Linux   []string
-		Darwin  []string
-	}
-	Scope               []string
-	GaugeVersionSupport version.VersionSupport
-	pluginPath          string
-}
+const (
+	executionScope          pluginScope = "execution"
+	docScope                pluginScope = "documentation"
+	pluginConnectionPortEnv             = "plugin_connection_port"
+	debugEnv                            = "debugging"
+)
 
 type plugin struct {
 	mutex      *sync.Mutex
 	connection net.Conn
 	pluginCmd  *exec.Cmd
 	descriptor *pluginDescriptor
+	killTimer  *time.Timer
 }
 
-func (p *plugin) IsProcessRunning() bool {
+func isProcessRunning(p *plugin) bool {
 	p.mutex.Lock()
 	ps := p.pluginCmd.ProcessState
 	p.mutex.Unlock()
 	return ps == nil || !ps.Exited()
 }
 
+func (p *plugin) rejuvenate() error {
+	if p.killTimer == nil {
+		return fmt.Errorf("timer is uninitialized. Perhaps kill is not yet invoked")
+	}
+	logger.Debugf(true, "Extending the plugin_kill_timeout for %s", p.descriptor.ID)
+	p.killTimer.Reset(config.PluginKillTimeout())
+	return nil
+}
+
 func (p *plugin) kill(wg *sync.WaitGroup) error {
 	defer wg.Done()
-	if p.IsProcessRunning() {
+	if isProcessRunning(p) {
 		defer p.connection.Close()
+		p.killTimer = time.NewTimer(config.PluginKillTimeout())
 		conn.SendProcessKillMessage(p.connection)
 
 		exited := make(chan bool, 1)
 		go func() {
 			for {
-				if p.IsProcessRunning() {
+				if isProcessRunning(p) {
 					time.Sleep(100 * time.Millisecond)
 				} else {
 					exited <- true
@@ -96,11 +94,12 @@ func (p *plugin) kill(wg *sync.WaitGroup) error {
 			}
 		}()
 		select {
-		case done := <-exited:
-			if done {
-				logger.Debugf(true, "Plugin [%s] with pid [%d] has exited", p.descriptor.Name, p.pluginCmd.Process.Pid)
+		case <-exited:
+			if !p.killTimer.Stop() {
+				<-p.killTimer.C
 			}
-		case <-time.After(config.PluginKillTimeout()):
+			logger.Debugf(true, "Plugin [%s] with pid [%d] has exited", p.descriptor.Name, p.pluginCmd.Process.Pid)
+		case <-p.killTimer.C:
 			logger.Warningf(true, "Plugin [%s] with pid [%d] did not exit after %.2f seconds. Forcefully killing it.", p.descriptor.Name, p.pluginCmd.Process.Pid, config.PluginKillTimeout().Seconds())
 			err := p.pluginCmd.Process.Kill()
 			if err != nil {
@@ -168,7 +167,7 @@ func GetPluginDescriptorFromJSON(pluginJSON string) (*pluginDescriptor, error) {
 	return &pd, nil
 }
 
-func StartPlugin(pd *pluginDescriptor, action string) (*plugin, error) {
+func StartPlugin(pd *pluginDescriptor, action pluginScope) (*plugin, error) {
 	command := []string{}
 	switch runtime.GOOS {
 	case "windows":
@@ -201,8 +200,8 @@ func StartPlugin(pd *pluginDescriptor, action string) (*plugin, error) {
 	return plugin, nil
 }
 
-func SetEnvForPlugin(action string, pd *pluginDescriptor, manifest *manifest.Manifest, pluginEnvVars map[string]string) error {
-	pluginEnvVars[fmt.Sprintf("%s_action", pd.ID)] = action
+func SetEnvForPlugin(action pluginScope, pd *pluginDescriptor, manifest *manifest.Manifest, pluginEnvVars map[string]string) error {
+	pluginEnvVars[fmt.Sprintf("%s_action", pd.ID)] = string(action)
 	pluginEnvVars["test_language"] = manifest.Language
 	if err := setEnvironmentProperties(pluginEnvVars); err != nil {
 		return err
@@ -244,13 +243,19 @@ func startPluginsForExecution(manifest *manifest.Manifest) (Handler, []string) {
 			warnings = append(warnings, fmt.Sprintf("Compatible %s plugin version to current Gauge version %s not found", pd.Name, version.CurrentGaugeVersion))
 			continue
 		}
-		if isPluginValidFor(pd, executionScope) {
-			gaugeConnectionHandler, err := conn.NewGaugeConnectionHandler(0, nil)
+		if pd.hasScope(executionScope) {
+			gaugeConnectionHandler, err := conn.NewGaugeConnectionHandler(0, &keepAliveHandler{ph: handler})
 			if err != nil {
 				warnings = append(warnings, err.Error())
 				continue
 			}
 			envProperties[pluginConnectionPortEnv] = strconv.Itoa(gaugeConnectionHandler.ConnectionPortNumber())
+			prop, err := common.GetGaugeConfiguration()
+			if err != nil {
+				warnings = append(warnings, fmt.Sprintf("Unable to read Gauge configuration. %s", err.Error()))
+				continue
+			}
+			envProperties["plugin_kill_timeout"] = prop["plugin_kill_timeout"]
 			err = SetEnvForPlugin(executionScope, pd, manifest, envProperties)
 			if err != nil {
 				warnings = append(warnings, fmt.Sprintf("Error setting environment for plugin %s %s. %s", pd.Name, pd.Version, err.Error()))
@@ -284,7 +289,7 @@ func GenerateDoc(pluginName string, specDirs []string, port int) {
 	if err := version.CheckCompatibility(version.CurrentGaugeVersion, &pd.GaugeVersionSupport); err != nil {
 		logger.Fatalf(true, "Compatible %s plugin version to current Gauge version %s not found", pd.Name, version.CurrentGaugeVersion)
 	}
-	if !isPluginValidFor(pd, docScope) {
+	if !pd.hasScope(docScope) {
 		logger.Fatalf(true, "Invalid plugin name: %s, this plugin cannot generate documentation.", pd.Name)
 	}
 	var sources []string
@@ -299,17 +304,8 @@ func GenerateDoc(pluginName string, specDirs []string, port int) {
 	if err != nil {
 		logger.Fatalf(true, "Error starting plugin %s %s. %s", pd.Name, pd.Version, err.Error())
 	}
-	for p.IsProcessRunning() {
+	for isProcessRunning(p) {
 	}
-}
-
-func isPluginValidFor(pd *pluginDescriptor, scope string) bool {
-	for _, s := range pd.Scope {
-		if strings.ToLower(s) == scope {
-			return true
-		}
-	}
-	return false
 }
 
 func (p *plugin) sendMessage(message *gauge_messages.Message) error {
@@ -336,7 +332,7 @@ func PluginsWithoutScope() (infos []pluginInfo.PluginInfo) {
 	if plugins, err := pluginInfo.GetAllInstalledPluginsWithVersion(); err == nil {
 		for _, p := range plugins {
 			pd, err := GetPluginDescriptor(p.Name, p.Version.String())
-			if err == nil && len(pd.Scope) == 0 {
+			if err == nil && !pd.hasAnyScope() {
 				infos = append(infos, p)
 			}
 		}

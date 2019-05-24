@@ -18,9 +18,12 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/getgauge/gauge/config"
+	"github.com/getgauge/gauge/env"
 	"github.com/getgauge/gauge/execution"
 	"github.com/getgauge/gauge/filter"
 	"github.com/getgauge/gauge/logger"
@@ -61,13 +64,14 @@ var (
 		},
 		DisableAutoGenTag: true,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			initLogger(cmd.Name())
 			skel.CreateSkelFilesIfRequired()
 			track.Init()
 			config.SetProjectRoot(args)
-			initLogger(cmd.Name())
 			setGlobalFlags()
 			initPackageFlags()
 		},
+		PersistentPostRun: notifyTelemetryIfNeeded,
 	}
 	logLevel        string
 	dir             string
@@ -75,13 +79,43 @@ var (
 	gaugeVersion    bool
 )
 
+type notification struct {
+	Title   string `json:"title"`
+	Message string `json:"message"`
+	Type    string `json:"type"`
+}
+
+func (status *notification) getJSON() (string, error) {
+	j, err := json.Marshal(status)
+	if err != nil {
+		return "", err
+	}
+	return string(j), nil
+}
+
+func notifyTelemetryIfNeeded(cmd *cobra.Command, args []string) {
+	if !gaugeVersion && !config.TelemetryConsent() {
+		if machineReadable {
+			n := &notification{
+				Title:   "Gauge Telemetry",
+				Message: track.GaugeTelemetryMachineRedableMessage,
+				Type:    "info",
+			}
+			s, _ := n.getJSON()
+			fmt.Printf("{\"type\":\"notification\",\"notification\":%s}\n", s)
+		} else {
+			fmt.Printf("%s\n%s\n", track.GaugeTelemetryMessageHeading, track.GaugeTelemetryMessage)
+		}
+	}
+}
+
 func initLogger(n string) {
 	if lsp {
-		logger.Initialize(logLevel, logger.LSP)
+		logger.Initialize(machineReadable, logLevel, logger.LSP)
 	} else if n == "daemon" {
-		logger.Initialize(logLevel, logger.API)
+		logger.Initialize(machineReadable, logLevel, logger.API)
 	} else {
-		logger.Initialize(logLevel, logger.CLI)
+		logger.Initialize(machineReadable, logLevel, logger.CLI)
 	}
 }
 
@@ -149,11 +183,14 @@ func initPackageFlags() {
 	reporter.SimpleConsoleOutput = simpleConsole
 	reporter.Verbose = verbose
 	reporter.MachineReadable = machineReadable
+	execution.MachineReadable = machineReadable
 	execution.ExecuteTags = tags
 	execution.SetTableRows(rows)
 	validation.TableRows = rows
 	execution.NumberOfExecutionStreams = streams
 	execution.InParallel = parallel
+	execution.TagsToFilterForParallelRun = tagsToFilterForParallelRun
+	execution.Verbose = verbose
 	execution.Strategy = strategy
 	filter.ExecuteTags = tags
 	order.Sorted = sort
@@ -164,14 +201,24 @@ func initPackageFlags() {
 	if group != -1 {
 		execution.Strategy = execution.Eager
 	}
+	filter.ScenariosName = scenarios
+	execution.MaxRetriesCount = maxRetriesCount
+	execution.RetryOnlyTags = retryOnlyTags
 }
 
-func exit(err error, additionalText string) {
+var exit = func(err error, additionalText string) {
 	if err != nil {
 		logger.Errorf(true, err.Error())
 	}
 	if additionalText != "" {
 		logger.Infof(true, additionalText)
 	}
-	os.Exit(0)
+	os.Exit(1)
+}
+
+func loadEnvAndReinitLogger(cmd *cobra.Command) {
+	if e := env.LoadEnv(environment); e != nil {
+		logger.Fatalf(true, e.Error())
+	}
+	initLogger(cmd.Name())
 }

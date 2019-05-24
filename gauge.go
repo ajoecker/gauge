@@ -18,6 +18,7 @@
 package main
 
 import (
+	"os"
 	"runtime/debug"
 
 	"github.com/getgauge/gauge/cmd"
@@ -28,6 +29,7 @@ func main() {
 	defer recoverPanic()
 	if err := cmd.Parse(); err != nil {
 		logger.Info(true, err.Error())
+		os.Exit(1)
 	}
 }
 

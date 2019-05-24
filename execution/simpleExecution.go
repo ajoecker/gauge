@@ -31,9 +31,11 @@ import (
 	"github.com/getgauge/gauge/runner"
 )
 
+// ExecuteTags holds the tags to filter the execution by
 var ExecuteTags = ""
 var tableRowsIndexes []int
 
+// SetTableRows is used to limit data driven execution to specific rows
 func SetTableRows(tableRows string) {
 	tableRowsIndexes = getDataTableRows(tableRows)
 }
@@ -147,12 +149,15 @@ func (e *simpleExecution) executeSpecs(sc *gauge.SpecCollection) (results []*res
 
 func (e *simpleExecution) notifyBeforeSuite() {
 	m := &gauge_messages.Message{MessageType: gauge_messages.Message_ExecutionStarting,
-		ExecutionStartingRequest: &gauge_messages.ExecutionStartingRequest{}}
+		ExecutionStartingRequest: &gauge_messages.ExecutionStartingRequest{CurrentExecutionInfo: e.currentExecutionInfo}}
 	res := e.executeHook(m)
 	e.suiteResult.PreHookMessages = res.Message
+	e.suiteResult.PreHookScreenshots = res.Screenshots
 	if res.GetFailed() {
 		handleHookFailure(e.suiteResult, res, result.AddPreHook)
 	}
+	m.ExecutionStartingRequest.SuiteResult = gauge.ConvertToProtoSuiteResult(e.suiteResult)
+	e.pluginHandler.NotifyPlugins(m)
 }
 
 func (e *simpleExecution) notifyAfterSuite() {
@@ -160,9 +165,12 @@ func (e *simpleExecution) notifyAfterSuite() {
 		ExecutionEndingRequest: &gauge_messages.ExecutionEndingRequest{CurrentExecutionInfo: e.currentExecutionInfo}}
 	res := e.executeHook(m)
 	e.suiteResult.PostHookMessages = res.Message
+	e.suiteResult.PostHookScreenshots = res.Screenshots
 	if res.GetFailed() {
 		handleHookFailure(e.suiteResult, res, result.AddPostHook)
 	}
+	m.ExecutionEndingRequest.SuiteResult = gauge.ConvertToProtoSuiteResult(e.suiteResult)
+	e.pluginHandler.NotifyPlugins(m)
 }
 
 func (e *simpleExecution) initSuiteDataStore() *(gauge_messages.ProtoExecutionResult) {

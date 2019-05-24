@@ -137,7 +137,7 @@ func Validate(args []string) {
 	if res.ErrMap.HasErrors() {
 		os.Exit(1)
 	}
-	logger.Infof(true, "No error found.")
+	logger.Infof(true, "No errors found.")
 }
 
 //TODO : duplicate in execute.go. Need to fix runner init.
@@ -252,8 +252,16 @@ func FilterDuplicates(validationErrors validationErrors) []error {
 	exists := make(map[string]bool)
 	for _, errs := range validationErrors {
 		for _, e := range errs {
-			if _, ok := exists[e.(StepValidationError).step.Value]; !ok {
-				exists[e.(StepValidationError).step.Value] = true
+			var val string
+			if vErr, ok := e.(StepValidationError); ok {
+				val = vErr.step.Value + vErr.step.FileName + strconv.Itoa(e.(StepValidationError).step.LineNo)
+			} else if vErr, ok := e.(SpecValidationError); ok {
+				val = vErr.message + vErr.fileName
+			} else {
+				continue
+			}
+			if _, ok := exists[val]; !ok {
+				exists[val] = true
 				filteredErrs = append(filteredErrs, e)
 			}
 		}

@@ -18,6 +18,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -53,10 +54,26 @@ const (
 
 var level logging.Level
 var activeLogger *logging.Logger
-var fileLogFormat = logging.MustStringFormatter("%{time:15:04:05.000} %{message}")
+var fileLogFormat = logging.MustStringFormatter("%{time:02-01-2006 15:04:05.000} [Gauge] [%{level}] %{message}")
 var isLSP bool
 var initialized bool
 var ActiveLogFile string
+var machineReadable bool
+
+// OutMessage contains information for output log
+type OutMessage struct {
+	MessageType string `json:"type"`
+	Message     string `json:"message"`
+}
+
+// ToJSON converts OutMessage into JSON
+func (out *OutMessage) ToJSON() (string, error) {
+	json, err := json.Marshal(out)
+	if err != nil {
+		return "", err
+	}
+	return string(json), nil
+}
 
 // Info logs INFO messages. stdout flag indicates if message is to be written to stdout in addition to log.
 func Info(stdout bool, msg string) {
@@ -65,10 +82,10 @@ func Info(stdout bool, msg string) {
 
 // Infof logs INFO messages. stdout flag indicates if message is to be written to stdout in addition to log.
 func Infof(stdout bool, msg string, args ...interface{}) {
+	write(stdout, msg, args...)
 	if !initialized {
 		return
 	}
-	write(stdout, msg, args...)
 	activeLogger.Infof(msg, args...)
 }
 
@@ -79,11 +96,11 @@ func Error(stdout bool, msg string) {
 
 // Errorf logs ERROR messages. stdout flag indicates if message is to be written to stdout in addition to log.
 func Errorf(stdout bool, msg string, args ...interface{}) {
+	write(stdout, msg, args...)
 	if !initialized {
-		fmt.Fprintf(os.Stderr, msg, args)
+		fmt.Fprintf(os.Stderr, msg, args...)
 		return
 	}
-	write(stdout, msg, args...)
 	activeLogger.Errorf(msg, args...)
 }
 
@@ -94,10 +111,10 @@ func Warning(stdout bool, msg string) {
 
 // Warningf logs WARNING messages. stdout flag indicates if message is to be written to stdout in addition to log.
 func Warningf(stdout bool, msg string, args ...interface{}) {
+	write(stdout, msg, args...)
 	if !initialized {
 		return
 	}
-	write(stdout, msg, args...)
 	activeLogger.Warningf(msg, args...)
 }
 
@@ -110,7 +127,7 @@ func Fatal(stdout bool, msg string) {
 func Fatalf(stdout bool, msg string, args ...interface{}) {
 	message := getErrorText(msg, args...)
 	if !initialized {
-		fmt.Fprintf(os.Stderr, msg, args)
+		fmt.Fprintf(os.Stderr, msg, args...)
 		return
 	}
 	write(stdout, message)
@@ -169,15 +186,25 @@ func getPluginVersions() string {
 
 func write(stdout bool, msg string, args ...interface{}) {
 	if !isLSP && stdout {
-		fmt.Println(fmt.Sprintf(msg, args...))
+		if machineReadable {
+			strs := strings.Split(fmt.Sprintf(msg, args...), "\n")
+			for _, m := range strs {
+				outMessage := &OutMessage{MessageType: "out", Message: m}
+				m, _ = outMessage.ToJSON()
+				fmt.Println(m)
+			}
+		} else {
+			fmt.Println(fmt.Sprintf(msg, args...))
+		}
 	}
 }
 
 // Initialize initializes the logger object
-func Initialize(logLevel string, c channel) {
+func Initialize(isMachineReadable bool, logLevel string, c channel) {
 	initialized = true
 	level = loggingLevel(logLevel)
 	activeLogger = logger(c)
+	machineReadable = isMachineReadable
 }
 
 func logger(c channel) *logging.Logger {
@@ -227,19 +254,19 @@ func addLogsDirPath(logFileName string) string {
 	return filepath.Join(customLogsDir, logFileName)
 }
 
-func getLogFile(fileName string) string {
-	if filepath.IsAbs(fileName) {
-		return fileName
+func getLogFile(logFileName string) string {
+	logDirPath := addLogsDirPath(logFileName)
+	if filepath.IsAbs(logDirPath) {
+		return logDirPath
 	}
-	fileName = addLogsDirPath(fileName)
 	if config.ProjectRoot != "" {
-		return filepath.Join(config.ProjectRoot, fileName)
+		return filepath.Join(config.ProjectRoot, logDirPath)
 	}
 	gaugeHome, err := common.GetGaugeHomeDirectory()
 	if err != nil {
-		return fileName
+		return logDirPath
 	}
-	return filepath.Join(gaugeHome, fileName)
+	return filepath.Join(gaugeHome, logDirPath)
 }
 
 func loggingLevel(logLevel string) logging.Level {

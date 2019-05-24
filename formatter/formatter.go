@@ -24,6 +24,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/getgauge/gauge/gauge_messages"
+
 	"github.com/getgauge/common"
 	"github.com/getgauge/gauge/gauge"
 	"github.com/getgauge/gauge/logger"
@@ -75,13 +77,35 @@ func FormatStep(step *gauge.Step) string {
 			formattedTable := FormatTable(&argument.Table)
 			formattedArg = fmt.Sprintf("\n%s", formattedTable)
 		} else if argument.ArgType == gauge.Dynamic {
-			formattedArg = fmt.Sprintf("<%s>", parser.GetUnescapedString(argument.Value))
+			formattedArg = fmt.Sprintf("<%s>", parser.GetUnescapedString(argument.Name))
 		} else if argument.ArgType == gauge.SpecialString || argument.ArgType == gauge.SpecialTable {
 			formattedArg = fmt.Sprintf("<%s>", parser.GetUnescapedString(argument.Name))
 		} else {
 			formattedArg = fmt.Sprintf("\"%s\"", parser.GetUnescapedString(argument.Value))
 		}
 		text = strings.Replace(text, gauge.ParameterPlaceholder, formattedArg, 1)
+	}
+	stepText := ""
+	if strings.HasSuffix(text, "\n") {
+		stepText = fmt.Sprintf("* %s", text)
+	} else {
+		stepText = fmt.Sprintf("* %s%s\n", text, step.Suffix)
+	}
+	return stepText
+}
+
+func FormatStepWithResolvedArgs(step *gauge.Step) string {
+	text := step.Value
+	paramCount := strings.Count(text, gauge.ParameterPlaceholder)
+	for i := 0; i < paramCount; i++ {
+		argument := step.Args[i]
+		for i := range step.GetFragments() {
+			stepFragmet := step.GetFragments()[i]
+			if argument.ArgType == gauge.Dynamic && stepFragmet.FragmentType == gauge_messages.Fragment_Parameter && stepFragmet.Parameter.ParameterType == gauge_messages.Parameter_Dynamic {
+				formattedArg := fmt.Sprintf("\"%s\"", stepFragmet.GetParameter().Value)
+				text = strings.Replace(text, gauge.ParameterPlaceholder, formattedArg, 1)
+			}
+		}
 	}
 	stepText := ""
 	if strings.HasSuffix(text, "\n") {

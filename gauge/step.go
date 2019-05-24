@@ -48,6 +48,12 @@ type Step struct {
 	Suffix         string
 }
 
+type StepDiff struct {
+	OldStep   Step
+	NewStep   *Step
+	IsConcept bool
+}
+
 func (step *Step) GetArg(name string) (*StepArg, error) {
 	arg, err := step.Lookup.GetArg(name)
 	if err != nil {
@@ -74,17 +80,19 @@ func (step *Step) GetLineText() string {
 	return step.LineText
 }
 
-func (step *Step) Rename(oldStep Step, newStep Step, isRefactored bool, orderMap map[int]int, isConcept *bool) bool {
+func (step *Step) Rename(oldStep Step, newStep Step, isRefactored bool, orderMap map[int]int, isConcept *bool) (*StepDiff, bool) {
+	diff := &StepDiff{OldStep: *step}
 	if strings.TrimSpace(step.Value) != strings.TrimSpace(oldStep.Value) {
-		return isRefactored
+		return nil, isRefactored
 	}
 	if step.IsConcept {
 		*isConcept = true
 	}
 	step.Value = newStep.Value
-
+	diff.IsConcept = *isConcept
 	step.Args = step.getArgsInOrder(newStep, orderMap)
-	return true
+	diff.NewStep = step
+	return diff, true
 }
 
 func (step *Step) UsesDynamicArgs(args ...string) bool {
@@ -113,11 +121,15 @@ func (step *Step) getArgsInOrder(newStep Step, orderMap map[int]int) []*StepArg 
 	args := make([]*StepArg, len(newStep.Args))
 	for key, value := range orderMap {
 		arg := &StepArg{Value: newStep.Args[key].Value, ArgType: Static}
-		if newStep.Args[key].ArgType == SpecialString {
+		if newStep.Args[key].ArgType == SpecialString || newStep.Args[key].ArgType == SpecialTable {
 			arg = &StepArg{Name: newStep.Args[key].Name, Value: newStep.Args[key].Value, ArgType: newStep.Args[key].ArgType}
 		}
 		if step.IsConcept {
-			arg = &StepArg{Value: newStep.Args[key].Value, ArgType: Dynamic}
+			name := fmt.Sprintf("arg%d", key)
+			if newStep.Args[key].Value != "" && newStep.Args[key].ArgType != SpecialString {
+				name = newStep.Args[key].Value
+			}
+			arg = &StepArg{Name: name, Value: newStep.Args[key].Value, ArgType: Dynamic}
 		}
 		if value != -1 {
 			arg = step.Args[value]
@@ -133,10 +145,14 @@ func (step *Step) ReplaceArgsWithDynamic(args []*StepArg) {
 			if arg.String() == conceptArg.String() {
 				if conceptArg.ArgType == SpecialString || conceptArg.ArgType == SpecialTable {
 					reg := regexp.MustCompile(".*:")
-					step.Args[i] = &StepArg{Value: reg.ReplaceAllString(conceptArg.Name, ""), ArgType: Dynamic}
+					step.Args[i] = &StepArg{Name: reg.ReplaceAllString(conceptArg.Name, ""), ArgType: Dynamic}
 					continue
 				}
-				step.Args[i] = &StepArg{Value: replaceParamChar(conceptArg.Value), ArgType: Dynamic}
+				if conceptArg.ArgType == Dynamic {
+					step.Args[i] = &StepArg{Name: replaceParamChar(conceptArg.Name), ArgType: Dynamic}
+					continue
+				}
+				step.Args[i] = &StepArg{Name: replaceParamChar(conceptArg.Value), ArgType: Dynamic}
 			}
 		}
 	}

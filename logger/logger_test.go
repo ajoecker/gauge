@@ -32,7 +32,7 @@ import (
 )
 
 func TestLoggerInitWithInfoLevel(t *testing.T) {
-	Initialize("info", CLI)
+	Initialize(false, "info", CLI)
 
 	if !activeLogger.IsEnabledFor(logging.INFO) {
 		t.Error("Expected gaugeLog to be enabled for INFO")
@@ -40,7 +40,7 @@ func TestLoggerInitWithInfoLevel(t *testing.T) {
 }
 
 func TestLoggerInitWithDefaultLevel(t *testing.T) {
-	Initialize("", CLI)
+	Initialize(false, "", CLI)
 
 	if !activeLogger.IsEnabledFor(logging.INFO) {
 		t.Error("Expected gaugeLog to be enabled for default log level")
@@ -48,7 +48,7 @@ func TestLoggerInitWithDefaultLevel(t *testing.T) {
 }
 
 func TestLoggerInitWithDebugLevel(t *testing.T) {
-	Initialize("debug", CLI)
+	Initialize(false, "debug", CLI)
 
 	if !activeLogger.IsEnabledFor(logging.DEBUG) {
 		t.Error("Expected gaugeLog to be enabled for DEBUG")
@@ -56,7 +56,7 @@ func TestLoggerInitWithDebugLevel(t *testing.T) {
 }
 
 func TestLoggerInitWithWarningLevel(t *testing.T) {
-	Initialize("warning", CLI)
+	Initialize(false, "warning", CLI)
 
 	if !activeLogger.IsEnabledFor(logging.WARNING) {
 		t.Error("Expected gaugeLog to be enabled for WARNING")
@@ -64,7 +64,7 @@ func TestLoggerInitWithWarningLevel(t *testing.T) {
 }
 
 func TestLoggerInitWithErrorLevel(t *testing.T) {
-	Initialize("error", CLI)
+	Initialize(false, "error", CLI)
 
 	if !activeLogger.IsEnabledFor(logging.ERROR) {
 		t.Error("Expected gaugeLog to be enabled for ERROR")
@@ -81,34 +81,41 @@ func TestGetLogFileGivenRelativePathInGaugeProject(t *testing.T) {
 	}
 }
 
-func TestGetLogFileInGaugeProjectGivenAbsPath(t *testing.T) {
+func TestGetLogFileWhenLogsDirNotSet(t *testing.T) {
 	config.ProjectRoot, _ = filepath.Abs("_testdata")
-	want := filepath.Join(config.ProjectRoot, apiLogFileName)
+	want := filepath.Join(config.ProjectRoot, logs, apiLogFileName)
 
-	got := getLogFile(filepath.Join(config.ProjectRoot, apiLogFileName))
+	got := getLogFile(apiLogFileName)
 	if got != want {
 		t.Errorf("Got %s, want %s", got, want)
 	}
 }
 
-func TestGetLogFileInGaugeProjectCustomPath(t *testing.T) {
-	config.ProjectRoot, _ = filepath.Abs("_testdata")
-	customLogsDir := filepath.Join(config.ProjectRoot, "myLogsDir")
-	want := filepath.Join(customLogsDir, apiLogFileName)
-	got := getLogFile(filepath.Join(customLogsDir, apiLogFileName))
-
-	if got != want {
-		t.Errorf("Got %s, want %s", got, want)
-	}
-}
-
-func TestGetLogFileInGaugeProjectWhenCustomLogsDirIsSet(t *testing.T) {
+func TestGetLogFileInGaugeProjectWhenRelativeCustomLogsDirIsSet(t *testing.T) {
 	myLogsDir := "my_logs"
 	os.Setenv(logsDirectory, myLogsDir)
 	defer os.Unsetenv(logsDirectory)
 
 	config.ProjectRoot, _ = filepath.Abs("_testdata")
 	want := filepath.Join(config.ProjectRoot, myLogsDir, apiLogFileName)
+
+	got := getLogFile(apiLogFileName)
+
+	if got != want {
+		t.Errorf("Got %s, want %s", got, want)
+	}
+}
+
+func TestGetLogFileInGaugeProjectWhenAbsoluteCustomLogsDirIsSet(t *testing.T) {
+	myLogsDir, err := filepath.Abs("my_logs")
+	if err != nil {
+		t.Errorf("Unable to convert to absolute path, %s", err.Error())
+	}
+
+	os.Setenv(logsDirectory, myLogsDir)
+	defer os.Unsetenv(logsDirectory)
+
+	want := filepath.Join(myLogsDir, apiLogFileName)
 
 	got := getLogFile(apiLogFileName)
 
@@ -195,5 +202,25 @@ Your Environment Information -----------
 		if got != want {
 			t.Errorf("Got %s, want %s", got, want)
 		}
+	}
+}
+
+func TestToJSONWithPlainText(t *testing.T) {
+	outMessage := &OutMessage{MessageType: "out", Message: "plain text"}
+	want := "{\"type\":\"out\",\"message\":\"plain text\"}"
+
+	got, _ := outMessage.ToJSON()
+	if got != want {
+		t.Errorf("Got %s, want %s", got, want)
+	}
+}
+
+func TestToJSONWithInvalidJSONCharacters(t *testing.T) {
+	outMessage := &OutMessage{MessageType: "out", Message: "\n, \t, and \\ needs to be escaped to create a valid JSON"}
+	want := "{\"type\":\"out\",\"message\":\"\\n, \\t, and \\\\ needs to be escaped to create a valid JSON\"}"
+
+	got, _ := outMessage.ToJSON()
+	if got != want {
+		t.Errorf("Got %s, want %s", got, want)
 	}
 }

@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/getgauge/common"
 	"github.com/getgauge/gauge/gauge"
+	gm "github.com/getgauge/gauge/gauge_messages"
 	"github.com/getgauge/gauge/parser"
 	"github.com/getgauge/gauge/refactor"
 	"github.com/getgauge/gauge/util"
@@ -36,6 +36,10 @@ func rename(ctx context.Context, conn jsonrpc2.JSONRPC2, req *jsonrpc2.Request) 
 	if err := sendSaveFilesRequest(ctx, conn); err != nil {
 		return nil, err
 	}
+	return renameStep(req)
+}
+
+func renameStep(req *jsonrpc2.Request) (interface{}, error) {
 	var params lsp.RenameParams
 	var err error
 	if err = json.Unmarshal(*req.Params, &params); err != nil {
@@ -43,17 +47,8 @@ func rename(ctx context.Context, conn jsonrpc2.JSONRPC2, req *jsonrpc2.Request) 
 		return nil, err
 	}
 
-	spec, pResult := new(parser.SpecParser).ParseSpecText(getContent(params.TextDocument.URI), util.ConvertURItoFilePath(params.TextDocument.URI))
-	if !pResult.Ok {
-		return nil, fmt.Errorf("refactoring failed due to parse errors: \n%s", strings.Join(pResult.Errors(), "\n"))
-	}
-	var step *gauge.Step
-	for _, item := range spec.AllItems() {
-		if item.Kind() == gauge.StepKind && item.(*gauge.Step).LineNo-1 == params.Position.Line {
-			step = item.(*gauge.Step)
-			break
-		}
-	}
+	step, err := getStepToRefactor(params)
+
 	if step == nil {
 		return nil, fmt.Errorf("refactoring is supported for steps only")
 	}
@@ -64,20 +59,41 @@ func rename(ctx context.Context, conn jsonrpc2.JSONRPC2, req *jsonrpc2.Request) 
 		logWarning(req, warning)
 	}
 	if !refactortingResult.Success {
-		return nil, fmt.Errorf("Refactoring failed due to errors: %s", strings.Join(refactortingResult.Errors, "\t"))
+		return nil, fmt.Errorf("%s", strings.Join(refactortingResult.Errors, "\t"))
 	}
 	var result lsp.WorkspaceEdit
 	result.Changes = make(map[string][]lsp.TextEdit, 0)
-	if err := addWorkspaceEdits(&result, refactortingResult.SpecsChanged); err != nil {
-		return nil, err
-	}
-	if err := addWorkspaceEdits(&result, refactortingResult.ConceptsChanged); err != nil {
-		return nil, err
-	}
-	if err := addWorkspaceEdits(&result, refactortingResult.RunnerFilesChanged); err != nil {
+	changes := append(refactortingResult.SpecsChanged, append(refactortingResult.ConceptsChanged, refactortingResult.RunnerFilesChanged...)...)
+	if err := addWorkspaceEdits(&result, changes); err != nil {
 		return nil, err
 	}
 	return result, nil
+}
+
+func getStepToRefactor(params lsp.RenameParams) (*gauge.Step, error) {
+	file := util.ConvertURItoFilePath(params.TextDocument.URI)
+	if util.IsSpec(file) {
+		spec, pResult := new(parser.SpecParser).ParseSpecText(getContent(params.TextDocument.URI), util.ConvertURItoFilePath(params.TextDocument.URI))
+		if !pResult.Ok {
+			return nil, fmt.Errorf("refactoring failed due to parse errors: \n%s", strings.Join(pResult.Errors(), "\n"))
+		}
+		for _, item := range spec.AllItems() {
+			if item.Kind() == gauge.StepKind && item.(*gauge.Step).LineNo-1 == params.Position.Line {
+				return item.(*gauge.Step), nil
+			}
+		}
+	}
+	if util.IsConcept(file) {
+		steps, _ := new(parser.ConceptParser).Parse(getContent(params.TextDocument.URI), file)
+		for _, conStep := range steps {
+			for _, step := range conStep.ConceptSteps {
+				if step.LineNo-1 == params.Position.Line {
+					return step, nil
+				}
+			}
+		}
+	}
+	return nil, nil
 }
 
 func getNewStepName(params lsp.RenameParams, step *gauge.Step) string {
@@ -88,34 +104,19 @@ func getNewStepName(params lsp.RenameParams, step *gauge.Step) string {
 	return newName
 }
 
-func addWorkspaceEdits(result *lsp.WorkspaceEdit, filesChanged map[string]string) error {
-	diskFileCache := &files{cache: make(map[lsp.DocumentURI][]string)}
-	for fileName, text := range filesChanged {
-		uri := util.ConvertPathToURI(fileName)
-		var lastLineNo int
-		var lastLineLength int
-		if isOpen(uri) {
-			lastLineNo = getLineCount(uri) - 1
-			lastLineLength = len(getLine(uri, lastLineNo))
-		} else {
-			if !diskFileCache.exists(uri) {
-				contents, err := common.ReadFileContents(fileName)
-				if err != nil {
-					return err
-				}
-				diskFileCache.add(uri, contents)
+func addWorkspaceEdits(result *lsp.WorkspaceEdit, filesChanges []*gm.FileChanges) error {
+	for _, fileChange := range filesChanges {
+		uri := util.ConvertPathToURI(fileChange.FileName)
+		for _, diff := range fileChange.Diffs {
+			textEdit := lsp.TextEdit{
+				NewText: diff.Content,
+				Range: lsp.Range{
+					Start: lsp.Position{Line: int(diff.Span.Start - 1), Character: int(diff.Span.StartChar)},
+					End:   lsp.Position{Line: int(diff.Span.End - 1), Character: int(diff.Span.EndChar)},
+				},
 			}
-			lastLineNo = len(diskFileCache.content(uri)) - 1
-			lastLineLength = len(diskFileCache.line(uri, lastLineNo))
+			result.Changes[string(uri)] = append(result.Changes[string(uri)], textEdit)
 		}
-		textEdit := lsp.TextEdit{
-			NewText: text,
-			Range: lsp.Range{
-				Start: lsp.Position{Line: 0, Character: 0},
-				End:   lsp.Position{Line: lastLineNo, Character: lastLineLength},
-			},
-		}
-		result.Changes[string(uri)] = append(result.Changes[string(uri)], textEdit)
 	}
 	return nil
 }

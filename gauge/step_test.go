@@ -65,7 +65,7 @@ func (s *MySuite) TestPopulateFragmentsForStepWithParameters(c *C) {
 	headers := []string{"header1", "header2"}
 	row1 := []string{"row1", "row2"}
 	argTable.AddHeaders(headers)
-	argTable.AddRowValues(row1)
+	argTable.AddRowValues(argTable.CreateTableCells(row1))
 	arg3 := &StepArg{ArgType: SpecialString, Value: "text from file", Name: "file:foo.txt"}
 	arg4 := &StepArg{Table: *argTable, ArgType: TableArg}
 	stepArgs := []*StepArg{arg1, arg2, arg3, arg4}
@@ -174,12 +174,40 @@ func (s *MySuite) TestRenameStep(c *C) {
 	orderMap[0] = 1
 	orderMap[1] = 0
 	IsConcept := false
-	isRefactored := originalStep.Rename(*originalStep, *newStep, false, orderMap, &IsConcept)
+	diff, isRefactored := originalStep.Rename(*originalStep, *newStep, false, orderMap, &IsConcept)
 
 	c.Assert(isRefactored, Equals, true)
 	c.Assert(originalStep.Value, Equals, "step from {} {}")
 	c.Assert(originalStep.Args[0].Name, Equals, "arg2")
 	c.Assert(originalStep.Args[1].Name, Equals, "arg1")
+	c.Assert(diff.OldStep.Value, Equals, "step with {}")
+	c.Assert(diff.NewStep.Value, Equals, "step from {} {}")
+}
+
+func (s *MySuite) TestRenameConcept(c *C) {
+	originalStep := &Step{
+		LineNo:         3,
+		Value:          "concept with text file",
+		IsConcept:      true,
+		HasInlineTable: false}
+
+	argsInStep := []*StepArg{&StepArg{Name: "file:foo.txt", Value: "text from file", ArgType: SpecialString}}
+	newStep := &Step{
+		LineNo:         3,
+		Value:          "concept with text file {}",
+		Args:           argsInStep,
+		IsConcept:      true,
+		HasInlineTable: false}
+	orderMap := make(map[int]int)
+	orderMap[0] = -1
+	IsConcept := true
+	diff, isRefactored := originalStep.Rename(*originalStep, *newStep, false, orderMap, &IsConcept)
+	c.Assert(isRefactored, Equals, true)
+	c.Assert(originalStep.Value, Equals, "concept with text file {}")
+	c.Assert(originalStep.Args[0].Name, Equals, "arg0")
+	c.Assert(newStep.Args[0].Name, Equals, "file:foo.txt")
+	c.Assert(diff.OldStep.Value, Equals, "concept with text file")
+	c.Assert(diff.NewStep.Value, Equals, "concept with text file {}")
 }
 
 func (s *MySuite) TestGetLineTextForStep(c *C) {
@@ -205,9 +233,9 @@ func (s *MySuite) TestReplaceArgsWithDynamicForSpecialParam(c *C) {
 
 	step.ReplaceArgsWithDynamic(stepArgs)
 	c.Assert(step.Args[0].ArgType, Equals, Dynamic)
-	c.Assert(step.Args[0].Value, Equals, "first/first.csv")
+	c.Assert(step.Args[0].Name, Equals, "first/first.csv")
 	c.Assert(step.Args[1].ArgType, Equals, Dynamic)
-	c.Assert(step.Args[1].Value, Equals, "second/second.txt")
+	c.Assert(step.Args[1].Name, Equals, "second/second.txt")
 }
 
 func (s *MySuite) TestReplaceArgs(c *C) {
@@ -219,9 +247,9 @@ func (s *MySuite) TestReplaceArgs(c *C) {
 
 	step.ReplaceArgsWithDynamic(stepArgs)
 	c.Assert(step.Args[0].ArgType, Equals, Dynamic)
-	c.Assert(step.Args[0].Value, Equals, "text from file")
+	c.Assert(step.Args[0].Name, Equals, "text from file")
 	c.Assert(step.Args[1].ArgType, Equals, Dynamic)
-	c.Assert(step.Args[1].Value, Equals, "text from file")
+	c.Assert(step.Args[1].Name, Equals, "text from file")
 }
 
 func (s *MySuite) TestUsageDynamicArgs(c *C) {

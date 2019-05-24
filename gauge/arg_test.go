@@ -54,6 +54,7 @@ func (s *MySuite) TestAddArgValue(c *C) {
 	stepArg, err = lookup.GetArg("param2")
 	c.Assert(err, IsNil)
 	c.Assert(stepArg.Value, Equals, "value2")
+	c.Assert(stepArg.Name, Equals, "param2")
 }
 
 func (s *MySuite) TestErrorForInvalidArg(c *C) {
@@ -74,6 +75,7 @@ func (s *MySuite) TestGetLookupCopy(c *C) {
 	stepArg, err := copiedLookup.GetArg("param1")
 	c.Assert(err, IsNil)
 	c.Assert(stepArg.Value, Equals, "new value")
+	c.Assert(stepArg.Name, Equals, "param1")
 	stepArg, err = originalLookup.GetArg("param1")
 	c.Assert(err, IsNil)
 	c.Assert(stepArg.Value, Equals, "oldValue")
@@ -82,14 +84,16 @@ func (s *MySuite) TestGetLookupCopy(c *C) {
 func (s *MySuite) TestGetLookupFromTableRow(c *C) {
 	dataTable := new(Table)
 	dataTable.AddHeaders([]string{"id", "name"})
-	dataTable.AddRowValues([]string{"1", "admin"})
-	dataTable.AddRowValues([]string{"2", "root"})
+	dataTable.AddRowValues(dataTable.CreateTableCells([]string{"1", "admin"}))
+	dataTable.AddRowValues(dataTable.CreateTableCells([]string{"2", "root"}))
 
-	emptyLookup, err := new(ArgLookup).FromDataTableRow(new(Table), 0)
+	emptyLookup := new(ArgLookup)
+	err := emptyLookup.ReadDataTableRow(new(Table), 0)
 	c.Assert(err, IsNil)
 	c.Assert(emptyLookup.ParamIndexMap, IsNil)
 
-	lookup1, err := new(ArgLookup).FromDataTableRow(dataTable, 0)
+	lookup1 := new(ArgLookup)
+	err = lookup1.ReadDataTableRow(dataTable, 0)
 	c.Assert(err, IsNil)
 	idArg1, err := lookup1.GetArg("id")
 	c.Assert(err, IsNil)
@@ -100,7 +104,8 @@ func (s *MySuite) TestGetLookupFromTableRow(c *C) {
 	c.Assert(nameArg1.Value, Equals, "admin")
 	c.Assert(nameArg1.ArgType, Equals, Static)
 
-	lookup2, err := new(ArgLookup).FromDataTableRow(dataTable, 1)
+	lookup2 := new(ArgLookup)
+	err = lookup2.ReadDataTableRow(dataTable, 1)
 	c.Assert(err, IsNil)
 	idArg2, err := lookup2.GetArg("id")
 	c.Assert(err, IsNil)
@@ -110,4 +115,23 @@ func (s *MySuite) TestGetLookupFromTableRow(c *C) {
 	c.Assert(idArg2.ArgType, Equals, Static)
 	c.Assert(nameArg2.Value, Equals, "root")
 	c.Assert(nameArg2.ArgType, Equals, Static)
+}
+
+func (s *MySuite) TestGetLookupFromTables(c *C) {
+	t1 := new(Table)
+	t1.AddHeaders([]string{"id1", "name1"})
+	t1.AddRowValues(t1.CreateTableCells([]string{"1", "admin"}))
+	t1.AddRowValues(t1.CreateTableCells([]string{"2", "root"}))
+
+	t2 := new(Table)
+	t2.AddHeaders([]string{"id2", "name2"})
+	t2.AddRowValues(t2.CreateTableCells([]string{"1", "admin"}))
+	t2.AddRowValues(t2.CreateTableCells([]string{"2", "root"}))
+
+	l := new(ArgLookup).FromDataTables(t1, t2)
+
+	c.Assert(l.ContainsArg("id1"), Equals, true)
+	c.Assert(l.ContainsArg("name1"), Equals, true)
+	c.Assert(l.ContainsArg("id2"), Equals, true)
+	c.Assert(l.ContainsArg("name2"), Equals, true)
 }

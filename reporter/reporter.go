@@ -148,14 +148,19 @@ func ListenExecutionEvents(wg *sync.WaitGroup) {
 				skipped := e.Result.(*result.ScenarioResult).ProtoScenario.GetExecutionStatus() == gauge_messages.ExecutionStatus_SKIPPED
 				sce := e.Item.(*gauge.Scenario)
 				// if it is datatable driven execution
-				if !skipped && sce.DataTableRow.GetRowCount() != 0 {
-					r.DataTable(formatter.FormatTable(&sce.DataTableRow))
+				if !skipped {
+					if sce.SpecDataTableRow.GetRowCount() != 0 {
+						r.DataTable(formatter.FormatTable(&sce.SpecDataTableRow))
+					}
+					if sce.ScenarioDataTableRow.GetRowCount() != 0 {
+						r.DataTable(formatter.FormatTable(&sce.ScenarioDataTableRow))
+					}
 				}
 				r.ScenarioStart(sce, e.ExecutionInfo, e.Result)
 			case event.ConceptStart:
 				r.ConceptStart(formatter.FormatStep(e.Item.(*gauge.Step)))
 			case event.StepStart:
-				r.StepStart(formatter.FormatStep(e.Item.(*gauge.Step)))
+				r.StepStart(formatter.FormatStepWithResolvedArgs(e.Item.(*gauge.Step)))
 			case event.StepEnd:
 				r.StepEnd(e.Item.(gauge.Step), e.Result, e.ExecutionInfo)
 			case event.ConceptEnd:

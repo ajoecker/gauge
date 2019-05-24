@@ -41,6 +41,7 @@ const (
 	X86_64            = "amd64"
 	darwin            = "darwin"
 	linux             = "linux"
+	freebsd           = "freebsd"
 	windows           = "windows"
 	bin               = "bin"
 	gauge             = "gauge"
@@ -55,7 +56,9 @@ func runProcess(command string, arg ...string) {
 	cmd := exec.Command(command, arg...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	log.Printf("Execute %v\n", cmd.Args)
+	if *verbose {
+		log.Printf("Execute %v\n", cmd.Args)
+	}
 	err := cmd.Run()
 	if err != nil {
 		panic(err)
@@ -97,7 +100,11 @@ func runTests(coverage bool) {
 			runProcess("go", "tool", "cover", "-html=count.out")
 		}
 	} else {
-		runProcess("go", "test", "./...", "-v")
+		if *verbose {
+			runProcess("go", "test", "./...", "-v")
+		} else {
+			runProcess("go", "test", "./...")
+		}
 	}
 }
 
@@ -106,7 +113,9 @@ func installFiles(files map[string]string, installDir string) {
 	for src, dst := range files {
 		base := filepath.Base(src)
 		installDst := filepath.Join(installDir, dst)
-		log.Printf("Install %s -> %s\n", src, installDst)
+		if *verbose {
+			log.Printf("Install %s -> %s\n", src, installDst)
+		}
 		stat, err := os.Stat(src)
 		if err != nil {
 			panic(err)
@@ -143,7 +152,9 @@ var allPlatforms = flag.Bool("all-platforms", false, "Compiles for all platforms
 var targetLinux = flag.Bool("target-linux", false, "Compiles for linux only, both x86 and x86_64")
 var binDir = flag.String("bin-dir", "", "Specifies OS_PLATFORM specific binaries to install when cross compiling")
 var distro = flag.Bool("distro", false, "Create gauge distributable")
+var verbose = flag.Bool("verbose", false, "Print verbose details")
 var skipWindowsDistro = flag.Bool("skip-windows", false, "Skips creation of windows distributable on unix machines while cross platform compilation")
+var certFile = flag.String("certFile", "", "Should be passed for signing the windows installer")
 
 // Defines all the compile targets
 // Each target name is the directory name
@@ -153,10 +164,12 @@ var (
 		map[string]string{GOARCH: X86_64, GOOS: darwin, CGO_ENABLED: "0"},
 		map[string]string{GOARCH: X86, GOOS: linux, CGO_ENABLED: "0"},
 		map[string]string{GOARCH: X86_64, GOOS: linux, CGO_ENABLED: "0"},
+		map[string]string{GOARCH: X86, GOOS: freebsd, CGO_ENABLED: "0"},
+		map[string]string{GOARCH: X86_64, GOOS: freebsd, CGO_ENABLED: "0"},
 		map[string]string{GOARCH: X86, GOOS: windows, CC: "i586-mingw32-gcc", CGO_ENABLED: "1"},
 		map[string]string{GOARCH: X86_64, GOOS: windows, CC: "x86_64-w64-mingw32-gcc", CGO_ENABLED: "1"},
 	}
-	osDistroMap = map[string]distroFunc{windows: createWindowsDistro, linux: createLinuxPackage, darwin: createDarwinPackage}
+	osDistroMap = map[string]distroFunc{windows: createWindowsDistro, linux: createLinuxPackage, freebsd: createLinuxPackage, darwin: createDarwinPackage}
 )
 
 func main() {
@@ -165,7 +178,9 @@ func main() {
 	if *nightly {
 		buildMetadata = fmt.Sprintf("nightly-%s", time.Now().Format(nightlyDatelayout))
 	}
-	fmt.Println("Build: " + buildMetadata)
+	if *verbose {
+		fmt.Println("Build: " + buildMetadata)
+	}
 	if *test {
 		runTests(*coverage)
 	} else if *install {
@@ -212,7 +227,9 @@ func filteredPlatforms() []map[string]string {
 func crossCompileGauge() {
 	for _, platformEnv := range filteredPlatforms() {
 		setEnv(platformEnv)
-		log.Printf("Compiling for platform => OS:%s ARCH:%s \n", platformEnv[GOOS], platformEnv[GOARCH])
+		if *verbose {
+			log.Printf("Compiling for platform => OS:%s ARCH:%s \n", platformEnv[GOOS], platformEnv[GOARCH])
+		}
 		compileGauge()
 	}
 }
@@ -229,7 +246,9 @@ func createGaugeDistributables(forAllPlatforms bool) {
 	if forAllPlatforms {
 		for _, platformEnv := range filteredPlatforms() {
 			setEnv(platformEnv)
-			log.Printf("Creating distro for platform => OS:%s ARCH:%s \n", platformEnv[GOOS], platformEnv[GOARCH])
+			if *verbose {
+				log.Printf("Creating distro for platform => OS:%s ARCH:%s \n", platformEnv[GOOS], platformEnv[GOARCH])
+			}
 			createDistro()
 		}
 	} else {
@@ -252,12 +271,30 @@ func createWindowsDistro() {
 func createWindowsInstaller() {
 	pName := packageName()
 	distroDir, err := filepath.Abs(filepath.Join(deploy, pName))
+	installerFileName := filepath.Join(filepath.Dir(distroDir), pName)
 	if err != nil {
 		panic(err)
 	}
 	copyGaugeBinaries(distroDir)
+	runProcess("makensis.exe",
+		fmt.Sprintf("/DPRODUCT_VERSION=%s", getBuildVersion()),
+		fmt.Sprintf("/DGAUGE_DISTRIBUTABLES_DIR=%s", distroDir),
+		fmt.Sprintf("/DOUTPUT_FILE_NAME=%s.exe", installerFileName),
+		filepath.Join("build", "install", "windows", "gauge-install.nsi"))
 	createZipFromUtil(deploy, pName, pName)
 	os.RemoveAll(distroDir)
+	signExecutable(installerFileName+".exe", *certFile)
+}
+
+func signExecutable(exeFilePath string, certFilePath string) {
+	if getGOOS() == windows {
+		if certFilePath != "" {
+			log.Printf("Signing: %s", exeFilePath)
+			runProcess("signtool", "sign", "/f", certFilePath, "/debug", "/v", "/tr", "http://timestamp.digicert.com", "/a", "/fd", "sha256", "/td", "sha256", "/as", exeFilePath)
+		} else {
+			log.Printf("No certificate file passed. Executable won't be signed.")
+		}
+	}
 }
 
 func createDarwinPackage() {
@@ -335,7 +372,9 @@ func createZipFromUtil(dir, zipDir, pkgName string) {
 		zipargs = []string{"-noprofile", "-executionpolicy", "bypass", "-file", windowsZipScript, filepath.Join(absdir, zipDir), filepath.Join(absdir, pkgName+".zip")}
 	}
 	output, err := runCommand(zipcmd, zipargs...)
-	fmt.Println(output)
+	if *verbose {
+		fmt.Println(output)
+	}
 	if err != nil {
 		panic(fmt.Sprintf("Failed to zip: %s", err))
 	}

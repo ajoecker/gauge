@@ -18,15 +18,17 @@
 package config
 
 import (
+	"bufio"
 	"bytes"
+	"fmt"
 	"io"
-
 	"os"
 	"path/filepath"
-
-	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/getgauge/common"
+	"github.com/getgauge/gauge/version"
 )
 
 const comment = `This file contains Gauge specific internal configurations. Do not delete`
@@ -47,14 +49,14 @@ func (p *properties) set(k, v string) error {
 		p.p[k].Value = v
 		return nil
 	}
-	return fmt.Errorf("Config '%s' doesn't exist.", k)
+	return fmt.Errorf("config '%s' doesn't exist", k)
 }
 
 func (p *properties) get(k string) (string, error) {
 	if _, ok := p.p[k]; ok {
 		return p.p[k].Value, nil
 	}
-	return "", fmt.Errorf("Config '%s' doesn't exist.", k)
+	return "", fmt.Errorf("config '%s' doesn't exist", k)
 }
 
 func (p *properties) Format(f formatter) (string, error) {
@@ -67,10 +69,18 @@ func (p *properties) Format(f formatter) (string, error) {
 
 func (p *properties) String() string {
 	var buffer bytes.Buffer
+	buffer.WriteString("# Version " + version.FullVersion())
+	buffer.WriteString("\n")
 	buffer.WriteString("# ")
 	buffer.WriteString(comment)
 	buffer.WriteString("\n")
-	for _, v := range p.p {
+	var keys []string
+	for k := range p.p {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := p.p[k]
 		buffer.WriteString("\n")
 		buffer.WriteString("# ")
 		buffer.WriteString(v.description)
@@ -90,8 +100,7 @@ func (p *properties) Write(w io.Writer) (int, error) {
 func Properties() *properties {
 	return &properties{p: map[string]*property{
 		gaugeRepositoryURL:      newProperty(gaugeRepositoryURL, "https://downloads.gauge.org/plugin", "Url to get plugin versions"),
-		gaugeUpdateURL:          newProperty(gaugeUpdateURL, "https://downloads.gauge.org/gauge", "Url for latest gauge version"),
-		gaugeTemplatesURL:       newProperty(gaugeTemplatesURL, "https://downloads.gauge.org/templates", "Url to get templates list"),
+		gaugeTemplatesURL:       newProperty(gaugeTemplatesURL, "https://templates.gauge.org", "Url to get templates list"),
 		runnerConnectionTimeout: newProperty(runnerConnectionTimeout, "30000", "Timeout in milliseconds for making a connection to the language runner."),
 		pluginConnectionTimeout: newProperty(pluginConnectionTimeout, "10000", "Timeout in milliseconds for making a connection to plugins."),
 		pluginKillTimeOut:       newProperty(pluginKillTimeOut, "4000", "Timeout in milliseconds for a plugin to stop after a kill message has been sent."),
@@ -100,6 +109,7 @@ func Properties() *properties {
 		checkUpdates:            newProperty(checkUpdates, "true", "Allow Gauge and its plugin updates to be notified."),
 		telemetryEnabled:        newProperty(telemetryEnabled, "true", "Allow Gauge to collect anonymous usage statistics"),
 		telemetryLoggingEnabled: newProperty(telemetryLoggingEnabled, "false", "Log request sent to Gauge telemetry engine"),
+		telemetryConsent:        newProperty(telemetryConsent, "false", "Record user opt in/out for telemetry"),
 	}}
 }
 
@@ -133,7 +143,11 @@ func UpdateTelemetryLoggging(value string) error {
 }
 
 func Merge() error {
-	return writeConfig(MergedProperties())
+	v, err := gaugeVersionInProperties()
+	if err != nil || version.CompareVersions(v, version.CurrentGaugeVersion, version.LesserThanFunc) {
+		return writeConfig(MergedProperties())
+	}
+	return nil
 }
 
 func GetProperty(name string) (string, error) {
@@ -159,11 +173,10 @@ func newProperty(key, defaultValue, description string) *property {
 }
 
 func writeConfig(p *properties) error {
-	dir, err := common.GetConfigurationDir()
+	gaugePropertiesFile, err := gaugePropertiesFile()
 	if err != nil {
 		return err
 	}
-	gaugePropertiesFile := filepath.Join(dir, common.GaugePropertiesFile)
 	var f *os.File
 	if _, err = os.Stat(gaugePropertiesFile); err != nil {
 		f, err = os.Create(gaugePropertiesFile)
@@ -176,4 +189,31 @@ func writeConfig(p *properties) error {
 	defer f.Close()
 	_, err = p.Write(f)
 	return err
+}
+
+func gaugePropertiesFile() (string, error) {
+	dir, err := common.GetConfigurationDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, common.GaugePropertiesFile), err
+}
+
+func gaugeVersionInProperties() (*version.Version, error) {
+	var v *version.Version
+	pf, err := gaugePropertiesFile()
+	if err != nil {
+		return v, err
+	}
+	f, err := os.Open(pf)
+	if err != nil {
+		return v, err
+	}
+	defer f.Close()
+	r := bufio.NewReader(f)
+	l, _, err := r.ReadLine()
+	if err != nil {
+		return v, err
+	}
+	return version.ParseVersion(strings.TrimLeft(string(l), "# Version "))
 }

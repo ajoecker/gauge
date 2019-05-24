@@ -147,23 +147,24 @@ func TestGetEditPosition(t *testing.T) {
 func TestGetAllImplementedStepValues(t *testing.T) {
 	stepValues := []gauge.StepValue{
 		{
-			StepValue: "hello world",
-			Args:      []string{},
+			StepValue:              "hello world",
+			Args:                   []string{},
 			ParameterizedStepValue: "hello world",
 		},
 		{
-			StepValue: "hello {}",
-			Args:      []string{"world"},
+			StepValue:              "hello {}",
+			Args:                   []string{"world"},
 			ParameterizedStepValue: "hello <world>",
 		},
 	}
-	res := &gauge_messages.StepNamesResponse{
+	responses := map[gauge_messages.Message_MessageType]interface{}{}
+	responses[gauge_messages.Message_StepNamesResponse] = &gauge_messages.StepNamesResponse{
 		Steps: []string{
 			"hello world",
 			"hello <world>",
 		},
 	}
-	lRunner.runner = &runner.GrpcRunner{Timeout: time.Second * 30, Client: &mockLspClient{response: res}}
+	lRunner.runner = &runner.GrpcRunner{Client: &mockLspClient{responses: responses}, Timeout: time.Second * 30}
 
 	got, err := allImplementedStepValues()
 
@@ -178,7 +179,9 @@ func TestGetAllImplementedStepValues(t *testing.T) {
 }
 
 func TestGetAllImplementedStepValuesShouldGivesEmptyIfRunnerRespondWithError(t *testing.T) {
-	lRunner.runner = &runner.GrpcRunner{Timeout: time.Second * 30, Client: &mockLspClient{response: &gauge_messages.StepNamesResponse{}, err: fmt.Errorf("can't get steps")}}
+	responses := map[gauge_messages.Message_MessageType]interface{}{}
+	responses[gauge_messages.Message_StepNamesResponse] = &gauge_messages.StepNamesResponse{}
+	lRunner.runner = &runner.GrpcRunner{Timeout: time.Second * 30, Client: &mockLspClient{responses: responses, err: fmt.Errorf("can't get steps")}}
 	got, err := allImplementedStepValues()
 
 	if err == nil {
@@ -192,16 +195,16 @@ func TestGetAllImplementedStepValuesShouldGivesEmptyIfRunnerRespondWithError(t *
 func TestRemoveDuplicateStepValues(t *testing.T) {
 	stepValues := []gauge.StepValue{
 		{
-			Args: []string{},
+			Args:                   []string{},
 			ParameterizedStepValue: "hello world",
 			StepValue:              "hello world",
 		}, {
-			Args: []string{"world"},
+			Args:                   []string{"world"},
 			ParameterizedStepValue: "hello <world>",
 			StepValue:              "hello {}",
 		},
 		{
-			Args: []string{"gauge"},
+			Args:                   []string{"gauge"},
 			ParameterizedStepValue: "hello <gauge>",
 			StepValue:              "hello {}",
 		},

@@ -3,16 +3,25 @@
 
 package gauge_messages
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// / Execution Status
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+
+/// Execution Status
 type ExecutionStatus int32
 
 const (
@@ -28,6 +37,7 @@ var ExecutionStatus_name = map[int32]string{
 	2: "FAILED",
 	3: "SKIPPED",
 }
+
 var ExecutionStatus_value = map[string]int32{
 	"NOTEXECUTED": 0,
 	"PASSED":      1,
@@ -38,9 +48,12 @@ var ExecutionStatus_value = map[string]int32{
 func (x ExecutionStatus) String() string {
 	return proto.EnumName(ExecutionStatus_name, int32(x))
 }
-func (ExecutionStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
 
-// / Enumerates various item types that the proto item can contain. Valid types are: Step, Comment, Concept, Scenario, TableDrivenScenario, Table, Tags
+func (ExecutionStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{0}
+}
+
+/// Enumerates various item types that the proto item can contain. Valid types are: Step, Comment, Concept, Scenario, TableDrivenScenario, Table, Tags
 type ProtoItem_ItemType int32
 
 const (
@@ -62,6 +75,7 @@ var ProtoItem_ItemType_name = map[int32]string{
 	5: "Table",
 	6: "Tags",
 }
+
 var ProtoItem_ItemType_value = map[string]int32{
 	"Step":                0,
 	"Comment":             1,
@@ -75,9 +89,12 @@ var ProtoItem_ItemType_value = map[string]int32{
 func (x ProtoItem_ItemType) String() string {
 	return proto.EnumName(ProtoItem_ItemType_name, int32(x))
 }
-func (ProtoItem_ItemType) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{1, 0} }
 
-// / Enum representing the types of Fragment
+func (ProtoItem_ItemType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{1, 0}
+}
+
+/// Enum representing the types of Fragment
 type Fragment_FragmentType int32
 
 const (
@@ -89,6 +106,7 @@ var Fragment_FragmentType_name = map[int32]string{
 	0: "Text",
 	1: "Parameter",
 }
+
 var Fragment_FragmentType_value = map[string]int32{
 	"Text":      0,
 	"Parameter": 1,
@@ -97,9 +115,12 @@ var Fragment_FragmentType_value = map[string]int32{
 func (x Fragment_FragmentType) String() string {
 	return proto.EnumName(Fragment_FragmentType_name, int32(x))
 }
-func (Fragment_FragmentType) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{8, 0} }
 
-// / Enum representing types of Parameter.
+func (Fragment_FragmentType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{8, 0}
+}
+
+/// Enum representing types of Parameter.
 type Parameter_ParameterType int32
 
 const (
@@ -117,6 +138,7 @@ var Parameter_ParameterType_name = map[int32]string{
 	3: "Special_Table",
 	4: "Table",
 }
+
 var Parameter_ParameterType_value = map[string]int32{
 	"Static":         0,
 	"Dynamic":        1,
@@ -128,7 +150,10 @@ var Parameter_ParameterType_value = map[string]int32{
 func (x Parameter_ParameterType) String() string {
 	return proto.EnumName(Parameter_ParameterType_name, int32(x))
 }
-func (Parameter_ParameterType) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{9, 0} }
+
+func (Parameter_ParameterType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{9, 0}
+}
 
 type ProtoExecutionResult_ErrorType int32
 
@@ -141,6 +166,7 @@ var ProtoExecutionResult_ErrorType_name = map[int32]string{
 	0: "ASSERTION",
 	1: "VERIFICATION",
 }
+
 var ProtoExecutionResult_ErrorType_value = map[string]int32{
 	"ASSERTION":    0,
 	"VERIFICATION": 1,
@@ -149,8 +175,9 @@ var ProtoExecutionResult_ErrorType_value = map[string]int32{
 func (x ProtoExecutionResult_ErrorType) String() string {
 	return proto.EnumName(ProtoExecutionResult_ErrorType_name, int32(x))
 }
+
 func (ProtoExecutionResult_ErrorType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor3, []int{14, 0}
+	return fileDescriptor_423806180556987f, []int{14, 0}
 }
 
 type Error_ErrorType int32
@@ -164,6 +191,7 @@ var Error_ErrorType_name = map[int32]string{
 	0: "PARSE_ERROR",
 	1: "VALIDATION_ERROR",
 }
+
 var Error_ErrorType_value = map[string]int32{
 	"PARSE_ERROR":      0,
 	"VALIDATION_ERROR": 1,
@@ -172,39 +200,72 @@ var Error_ErrorType_value = map[string]int32{
 func (x Error_ErrorType) String() string {
 	return proto.EnumName(Error_ErrorType_name, int32(x))
 }
-func (Error_ErrorType) EnumDescriptor() ([]byte, []int) { return fileDescriptor3, []int{18, 0} }
 
-// / A proto object representing a Specification
-// / A specification can contain Scenarios or Steps, besides Comments
-type ProtoSpec struct {
-	// / Heading describing the Specification
-	SpecHeading string `protobuf:"bytes,1,opt,name=specHeading" json:"specHeading,omitempty"`
-	// / A collection of items that come under this step
-	Items []*ProtoItem `protobuf:"bytes,2,rep,name=items" json:"items,omitempty"`
-	// / Flag indicating if this is a Table Driven Specification. The table is defined in the context, this is different from using a table parameter.
-	IsTableDriven bool `protobuf:"varint,3,opt,name=isTableDriven" json:"isTableDriven,omitempty"`
-	// / Contains a 'before' hook failure message. This happens when the `before_spec` hook has an error.
-	PreHookFailures []*ProtoHookFailure `protobuf:"bytes,4,rep,name=preHookFailures" json:"preHookFailures,omitempty"`
-	// / Contains a 'before' hook failure message. This happens when the `after_hook` hook has an error.
-	PostHookFailures []*ProtoHookFailure `protobuf:"bytes,5,rep,name=postHookFailures" json:"postHookFailures,omitempty"`
-	// / Contains the filename for that holds this specification.
-	FileName string `protobuf:"bytes,6,opt,name=fileName" json:"fileName,omitempty"`
-	// / Contains a list of tags that are defined at the specification level. Scenario tags are not present here.
-	Tags []string `protobuf:"bytes,7,rep,name=tags" json:"tags,omitempty"`
-	// / Additional information at pre hook exec time to be available on reports
-	PreHookMessages []string `protobuf:"bytes,8,rep,name=preHookMessages" json:"preHookMessages,omitempty"`
-	// / Additional information at post hook exec time to be available on reports
-	PostHookMessages []string `protobuf:"bytes,9,rep,name=postHookMessages" json:"postHookMessages,omitempty"`
-	// / [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
-	PreHookMessage []string `protobuf:"bytes,10,rep,name=preHookMessage" json:"preHookMessage,omitempty"`
-	// / [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
-	PostHookMessage []string `protobuf:"bytes,11,rep,name=postHookMessage" json:"postHookMessage,omitempty"`
+func (Error_ErrorType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{20, 0}
 }
 
-func (m *ProtoSpec) Reset()                    { *m = ProtoSpec{} }
-func (m *ProtoSpec) String() string            { return proto.CompactTextString(m) }
-func (*ProtoSpec) ProtoMessage()               {}
-func (*ProtoSpec) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{0} }
+/// A proto object representing a Specification
+/// A specification can contain Scenarios or Steps, besides Comments
+type ProtoSpec struct {
+	/// Heading describing the Specification
+	SpecHeading string `protobuf:"bytes,1,opt,name=specHeading,proto3" json:"specHeading,omitempty"`
+	/// A collection of items that come under this step
+	Items []*ProtoItem `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	/// Flag indicating if this is a Table Driven Specification. The table is defined in the context, this is different from using a table parameter.
+	IsTableDriven bool `protobuf:"varint,3,opt,name=isTableDriven,proto3" json:"isTableDriven,omitempty"`
+	/// Contains a 'before' hook failure message. This happens when the `before_spec` hook has an error.
+	PreHookFailures []*ProtoHookFailure `protobuf:"bytes,4,rep,name=preHookFailures,proto3" json:"preHookFailures,omitempty"`
+	/// Contains a 'before' hook failure message. This happens when the `after_hook` hook has an error.
+	PostHookFailures []*ProtoHookFailure `protobuf:"bytes,5,rep,name=postHookFailures,proto3" json:"postHookFailures,omitempty"`
+	/// Contains the filename for that holds this specification.
+	FileName string `protobuf:"bytes,6,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	/// Contains a list of tags that are defined at the specification level. Scenario tags are not present here.
+	Tags []string `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	/// Additional information at pre hook exec time to be available on reports
+	PreHookMessages []string `protobuf:"bytes,8,rep,name=preHookMessages,proto3" json:"preHookMessages,omitempty"`
+	/// Additional information at post hook exec time to be available on reports
+	PostHookMessages []string `protobuf:"bytes,9,rep,name=postHookMessages,proto3" json:"postHookMessages,omitempty"`
+	/// [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
+	PreHookMessage []string `protobuf:"bytes,10,rep,name=preHookMessage,proto3" json:"preHookMessage,omitempty"` // Deprecated: Do not use.
+	/// [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
+	PostHookMessage []string `protobuf:"bytes,11,rep,name=postHookMessage,proto3" json:"postHookMessage,omitempty"` // Deprecated: Do not use.
+	/// Capture Screenshot at pre hook exec time to be available on reports
+	PreHookScreenshots [][]byte `protobuf:"bytes,12,rep,name=preHookScreenshots,proto3" json:"preHookScreenshots,omitempty"`
+	/// Capture Screenshot at post hook exec time to be available on reports
+	PostHookScreenshots [][]byte `protobuf:"bytes,13,rep,name=postHookScreenshots,proto3" json:"postHookScreenshots,omitempty"`
+	/// meta field to indicate the number of items in the list
+	/// used when items are sent as individual chunk
+	ItemCount            int64    `protobuf:"varint,14,opt,name=itemCount,proto3" json:"itemCount,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoSpec) Reset()         { *m = ProtoSpec{} }
+func (m *ProtoSpec) String() string { return proto.CompactTextString(m) }
+func (*ProtoSpec) ProtoMessage()    {}
+func (*ProtoSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{0}
+}
+
+func (m *ProtoSpec) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoSpec.Unmarshal(m, b)
+}
+func (m *ProtoSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoSpec.Marshal(b, m, deterministic)
+}
+func (m *ProtoSpec) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoSpec.Merge(m, src)
+}
+func (m *ProtoSpec) XXX_Size() int {
+	return xxx_messageInfo_ProtoSpec.Size(m)
+}
+func (m *ProtoSpec) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoSpec.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoSpec proto.InternalMessageInfo
 
 func (m *ProtoSpec) GetSpecHeading() string {
 	if m != nil {
@@ -269,6 +330,7 @@ func (m *ProtoSpec) GetPostHookMessages() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoSpec) GetPreHookMessage() []string {
 	if m != nil {
 		return m.PreHookMessage
@@ -276,6 +338,7 @@ func (m *ProtoSpec) GetPreHookMessage() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoSpec) GetPostHookMessage() []string {
 	if m != nil {
 		return m.PostHookMessage
@@ -283,30 +346,76 @@ func (m *ProtoSpec) GetPostHookMessage() []string {
 	return nil
 }
 
-// / Container for all valid Items under a Specification.
-type ProtoItem struct {
-	// / Itemtype of the current ProtoItem
-	ItemType ProtoItem_ItemType `protobuf:"varint,1,opt,name=itemType,enum=gauge.messages.ProtoItem_ItemType" json:"itemType,omitempty"`
-	// / Holds the Step definition. Valid only if ItemType = Step
-	Step *ProtoStep `protobuf:"bytes,2,opt,name=step" json:"step,omitempty"`
-	// / Holds the Concept definition. Valid only if ItemType = Concept
-	Concept *ProtoConcept `protobuf:"bytes,3,opt,name=concept" json:"concept,omitempty"`
-	// / Holds the Scenario definition. Valid only if ItemType = Scenario
-	Scenario *ProtoScenario `protobuf:"bytes,4,opt,name=scenario" json:"scenario,omitempty"`
-	// / Holds the TableDrivenScenario definition. Valid only if ItemType = TableDrivenScenario
-	TableDrivenScenario *ProtoTableDrivenScenario `protobuf:"bytes,5,opt,name=tableDrivenScenario" json:"tableDrivenScenario,omitempty"`
-	// / Holds the Comment definition. Valid only if ItemType = Comment
-	Comment *ProtoComment `protobuf:"bytes,6,opt,name=comment" json:"comment,omitempty"`
-	// / Holds the Table definition. Valid only if ItemType = Table
-	Table *ProtoTable `protobuf:"bytes,7,opt,name=table" json:"table,omitempty"`
-	// / Holds the Tags definition. Valid only if ItemType = Tags
-	Tags *ProtoTags `protobuf:"bytes,8,opt,name=tags" json:"tags,omitempty"`
+func (m *ProtoSpec) GetPreHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PreHookScreenshots
+	}
+	return nil
 }
 
-func (m *ProtoItem) Reset()                    { *m = ProtoItem{} }
-func (m *ProtoItem) String() string            { return proto.CompactTextString(m) }
-func (*ProtoItem) ProtoMessage()               {}
-func (*ProtoItem) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{1} }
+func (m *ProtoSpec) GetPostHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PostHookScreenshots
+	}
+	return nil
+}
+
+func (m *ProtoSpec) GetItemCount() int64 {
+	if m != nil {
+		return m.ItemCount
+	}
+	return 0
+}
+
+/// Container for all valid Items under a Specification.
+type ProtoItem struct {
+	/// Itemtype of the current ProtoItem
+	ItemType ProtoItem_ItemType `protobuf:"varint,1,opt,name=itemType,proto3,enum=gauge.messages.ProtoItem_ItemType" json:"itemType,omitempty"`
+	/// Holds the Step definition. Valid only if ItemType = Step
+	Step *ProtoStep `protobuf:"bytes,2,opt,name=step,proto3" json:"step,omitempty"`
+	/// Holds the Concept definition. Valid only if ItemType = Concept
+	Concept *ProtoConcept `protobuf:"bytes,3,opt,name=concept,proto3" json:"concept,omitempty"`
+	/// Holds the Scenario definition. Valid only if ItemType = Scenario
+	Scenario *ProtoScenario `protobuf:"bytes,4,opt,name=scenario,proto3" json:"scenario,omitempty"`
+	/// Holds the TableDrivenScenario definition. Valid only if ItemType = TableDrivenScenario
+	TableDrivenScenario *ProtoTableDrivenScenario `protobuf:"bytes,5,opt,name=tableDrivenScenario,proto3" json:"tableDrivenScenario,omitempty"`
+	/// Holds the Comment definition. Valid only if ItemType = Comment
+	Comment *ProtoComment `protobuf:"bytes,6,opt,name=comment,proto3" json:"comment,omitempty"`
+	/// Holds the Table definition. Valid only if ItemType = Table
+	Table *ProtoTable `protobuf:"bytes,7,opt,name=table,proto3" json:"table,omitempty"`
+	/// Holds the Tags definition. Valid only if ItemType = Tags
+	Tags *ProtoTags `protobuf:"bytes,8,opt,name=tags,proto3" json:"tags,omitempty"`
+	/// Holds the Filename that the item belongs to
+	FileName             string   `protobuf:"bytes,9,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoItem) Reset()         { *m = ProtoItem{} }
+func (m *ProtoItem) String() string { return proto.CompactTextString(m) }
+func (*ProtoItem) ProtoMessage()    {}
+func (*ProtoItem) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{1}
+}
+
+func (m *ProtoItem) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoItem.Unmarshal(m, b)
+}
+func (m *ProtoItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoItem.Marshal(b, m, deterministic)
+}
+func (m *ProtoItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoItem.Merge(m, src)
+}
+func (m *ProtoItem) XXX_Size() int {
+	return xxx_messageInfo_ProtoItem.Size(m)
+}
+func (m *ProtoItem) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoItem.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoItem proto.InternalMessageInfo
 
 func (m *ProtoItem) GetItemType() ProtoItem_ItemType {
 	if m != nil {
@@ -364,50 +473,84 @@ func (m *ProtoItem) GetTags() *ProtoTags {
 	return nil
 }
 
-// / A proto object representing a Scenario
-type ProtoScenario struct {
-	// / Heading of the given Scenario
-	ScenarioHeading string `protobuf:"bytes,1,opt,name=scenarioHeading" json:"scenarioHeading,omitempty"`
-	// / Flag to indicate if the Scenario execution failed
-	Failed bool `protobuf:"varint,2,opt,name=failed" json:"failed,omitempty"`
-	// / Collection of Context steps. The Context steps are executed before every run.
-	Contexts []*ProtoItem `protobuf:"bytes,3,rep,name=contexts" json:"contexts,omitempty"`
-	// / Collection of Items under a scenario. These could be Steps, Comments, Tags, TableDrivenScenarios or Tables
-	ScenarioItems []*ProtoItem `protobuf:"bytes,4,rep,name=scenarioItems" json:"scenarioItems,omitempty"`
-	// / Contains a 'before' hook failure message. This happens when the `before_scenario` hook has an error.
-	PreHookFailure *ProtoHookFailure `protobuf:"bytes,5,opt,name=preHookFailure" json:"preHookFailure,omitempty"`
-	// / Contains a 'after' hook failure message. This happens when the `after_scenario` hook has an error.
-	PostHookFailure *ProtoHookFailure `protobuf:"bytes,6,opt,name=postHookFailure" json:"postHookFailure,omitempty"`
-	// / Contains a list of tags that are defined at the specification level. Scenario tags are not present here.
-	Tags []string `protobuf:"bytes,7,rep,name=tags" json:"tags,omitempty"`
-	// / Holds the time taken for executing this scenario.
-	ExecutionTime int64 `protobuf:"varint,8,opt,name=executionTime" json:"executionTime,omitempty"`
-	// / Flag to indicate if the Scenario execution is skipped
-	Skipped bool `protobuf:"varint,9,opt,name=skipped" json:"skipped,omitempty"`
-	// / Holds the error messages for skipping scenario from execution
-	SkipErrors []string `protobuf:"bytes,10,rep,name=skipErrors" json:"skipErrors,omitempty"`
-	// / Holds the unique Identifier of a scenario.
-	ID string `protobuf:"bytes,11,opt,name=ID" json:"ID,omitempty"`
-	// / Collection of Teardown steps. The Teardown steps are executed after every run.
-	TearDownSteps []*ProtoItem `protobuf:"bytes,12,rep,name=tearDownSteps" json:"tearDownSteps,omitempty"`
-	// / Span(start, end) of scenario
-	Span *Span `protobuf:"bytes,13,opt,name=span" json:"span,omitempty"`
-	// / Execution status for the scenario
-	ExecutionStatus ExecutionStatus `protobuf:"varint,14,opt,name=executionStatus,enum=gauge.messages.ExecutionStatus" json:"executionStatus,omitempty"`
-	// / Additional information at pre hook exec time to be available on reports
-	PreHookMessages []string `protobuf:"bytes,15,rep,name=preHookMessages" json:"preHookMessages,omitempty"`
-	// / Additional information at post hook exec time to be available on reports
-	PostHookMessages []string `protobuf:"bytes,16,rep,name=postHookMessages" json:"postHookMessages,omitempty"`
-	// / [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
-	PreHookMessage []string `protobuf:"bytes,17,rep,name=preHookMessage" json:"preHookMessage,omitempty"`
-	// / [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
-	PostHookMessage []string `protobuf:"bytes,18,rep,name=postHookMessage" json:"postHookMessage,omitempty"`
+func (m *ProtoItem) GetFileName() string {
+	if m != nil {
+		return m.FileName
+	}
+	return ""
 }
 
-func (m *ProtoScenario) Reset()                    { *m = ProtoScenario{} }
-func (m *ProtoScenario) String() string            { return proto.CompactTextString(m) }
-func (*ProtoScenario) ProtoMessage()               {}
-func (*ProtoScenario) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{2} }
+/// A proto object representing a Scenario
+type ProtoScenario struct {
+	/// Heading of the given Scenario
+	ScenarioHeading string `protobuf:"bytes,1,opt,name=scenarioHeading,proto3" json:"scenarioHeading,omitempty"`
+	/// Flag to indicate if the Scenario execution failed
+	Failed bool `protobuf:"varint,2,opt,name=failed,proto3" json:"failed,omitempty"` // Deprecated: Do not use.
+	/// Collection of Context steps. The Context steps are executed before every run.
+	Contexts []*ProtoItem `protobuf:"bytes,3,rep,name=contexts,proto3" json:"contexts,omitempty"`
+	/// Collection of Items under a scenario. These could be Steps, Comments, Tags, TableDrivenScenarios or Tables
+	ScenarioItems []*ProtoItem `protobuf:"bytes,4,rep,name=scenarioItems,proto3" json:"scenarioItems,omitempty"`
+	/// Contains a 'before' hook failure message. This happens when the `before_scenario` hook has an error.
+	PreHookFailure *ProtoHookFailure `protobuf:"bytes,5,opt,name=preHookFailure,proto3" json:"preHookFailure,omitempty"`
+	/// Contains a 'after' hook failure message. This happens when the `after_scenario` hook has an error.
+	PostHookFailure *ProtoHookFailure `protobuf:"bytes,6,opt,name=postHookFailure,proto3" json:"postHookFailure,omitempty"`
+	/// Contains a list of tags that are defined at the specification level. Scenario tags are not present here.
+	Tags []string `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	/// Holds the time taken for executing this scenario.
+	ExecutionTime int64 `protobuf:"varint,8,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Flag to indicate if the Scenario execution is skipped
+	Skipped bool `protobuf:"varint,9,opt,name=skipped,proto3" json:"skipped,omitempty"` // Deprecated: Do not use.
+	/// Holds the error messages for skipping scenario from execution
+	SkipErrors []string `protobuf:"bytes,10,rep,name=skipErrors,proto3" json:"skipErrors,omitempty"`
+	/// Holds the unique Identifier of a scenario.
+	ID string `protobuf:"bytes,11,opt,name=ID,proto3" json:"ID,omitempty"`
+	/// Collection of Teardown steps. The Teardown steps are executed after every run.
+	TearDownSteps []*ProtoItem `protobuf:"bytes,12,rep,name=tearDownSteps,proto3" json:"tearDownSteps,omitempty"`
+	/// Span(start, end) of scenario
+	Span *Span `protobuf:"bytes,13,opt,name=span,proto3" json:"span,omitempty"`
+	/// Execution status for the scenario
+	ExecutionStatus ExecutionStatus `protobuf:"varint,14,opt,name=executionStatus,proto3,enum=gauge.messages.ExecutionStatus" json:"executionStatus,omitempty"`
+	/// Additional information at pre hook exec time to be available on reports
+	PreHookMessages []string `protobuf:"bytes,15,rep,name=preHookMessages,proto3" json:"preHookMessages,omitempty"`
+	/// Additional information at post hook exec time to be available on reports
+	PostHookMessages []string `protobuf:"bytes,16,rep,name=postHookMessages,proto3" json:"postHookMessages,omitempty"`
+	/// [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
+	PreHookMessage []string `protobuf:"bytes,17,rep,name=preHookMessage,proto3" json:"preHookMessage,omitempty"` // Deprecated: Do not use.
+	/// [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
+	PostHookMessage []string `protobuf:"bytes,18,rep,name=postHookMessage,proto3" json:"postHookMessage,omitempty"` // Deprecated: Do not use.
+	/// Capture Screenshot at pre hook exec time to be available on reports
+	PreHookScreenshots [][]byte `protobuf:"bytes,19,rep,name=preHookScreenshots,proto3" json:"preHookScreenshots,omitempty"`
+	/// Capture Screenshot at post hook exec time to be available on reports
+	PostHookScreenshots  [][]byte `protobuf:"bytes,20,rep,name=postHookScreenshots,proto3" json:"postHookScreenshots,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoScenario) Reset()         { *m = ProtoScenario{} }
+func (m *ProtoScenario) String() string { return proto.CompactTextString(m) }
+func (*ProtoScenario) ProtoMessage()    {}
+func (*ProtoScenario) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{2}
+}
+
+func (m *ProtoScenario) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoScenario.Unmarshal(m, b)
+}
+func (m *ProtoScenario) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoScenario.Marshal(b, m, deterministic)
+}
+func (m *ProtoScenario) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoScenario.Merge(m, src)
+}
+func (m *ProtoScenario) XXX_Size() int {
+	return xxx_messageInfo_ProtoScenario.Size(m)
+}
+func (m *ProtoScenario) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoScenario.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoScenario proto.InternalMessageInfo
 
 func (m *ProtoScenario) GetScenarioHeading() string {
 	if m != nil {
@@ -416,6 +559,7 @@ func (m *ProtoScenario) GetScenarioHeading() string {
 	return ""
 }
 
+// Deprecated: Do not use.
 func (m *ProtoScenario) GetFailed() bool {
 	if m != nil {
 		return m.Failed
@@ -465,6 +609,7 @@ func (m *ProtoScenario) GetExecutionTime() int64 {
 	return 0
 }
 
+// Deprecated: Do not use.
 func (m *ProtoScenario) GetSkipped() bool {
 	if m != nil {
 		return m.Skipped
@@ -521,6 +666,7 @@ func (m *ProtoScenario) GetPostHookMessages() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoScenario) GetPreHookMessage() []string {
 	if m != nil {
 		return m.PreHookMessage
@@ -528,6 +674,7 @@ func (m *ProtoScenario) GetPreHookMessage() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoScenario) GetPostHookMessage() []string {
 	if m != nil {
 		return m.PostHookMessage
@@ -535,18 +682,55 @@ func (m *ProtoScenario) GetPostHookMessage() []string {
 	return nil
 }
 
-// / A proto object representing a Span of content
-type Span struct {
-	Start     int64 `protobuf:"varint,1,opt,name=start" json:"start,omitempty"`
-	End       int64 `protobuf:"varint,2,opt,name=end" json:"end,omitempty"`
-	StartChar int64 `protobuf:"varint,3,opt,name=startChar" json:"startChar,omitempty"`
-	EndChar   int64 `protobuf:"varint,4,opt,name=endChar" json:"endChar,omitempty"`
+func (m *ProtoScenario) GetPreHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PreHookScreenshots
+	}
+	return nil
 }
 
-func (m *Span) Reset()                    { *m = Span{} }
-func (m *Span) String() string            { return proto.CompactTextString(m) }
-func (*Span) ProtoMessage()               {}
-func (*Span) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{3} }
+func (m *ProtoScenario) GetPostHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PostHookScreenshots
+	}
+	return nil
+}
+
+/// A proto object representing a Span of content
+type Span struct {
+	Start                int64    `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"`
+	End                  int64    `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`
+	StartChar            int64    `protobuf:"varint,3,opt,name=startChar,proto3" json:"startChar,omitempty"`
+	EndChar              int64    `protobuf:"varint,4,opt,name=endChar,proto3" json:"endChar,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Span) Reset()         { *m = Span{} }
+func (m *Span) String() string { return proto.CompactTextString(m) }
+func (*Span) ProtoMessage()    {}
+func (*Span) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{3}
+}
+
+func (m *Span) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Span.Unmarshal(m, b)
+}
+func (m *Span) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Span.Marshal(b, m, deterministic)
+}
+func (m *Span) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Span.Merge(m, src)
+}
+func (m *Span) XXX_Size() int {
+	return xxx_messageInfo_Span.Size(m)
+}
+func (m *Span) XXX_DiscardUnknown() {
+	xxx_messageInfo_Span.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Span proto.InternalMessageInfo
 
 func (m *Span) GetStart() int64 {
 	if m != nil {
@@ -576,18 +760,51 @@ func (m *Span) GetEndChar() int64 {
 	return 0
 }
 
-// / A proto object representing a TableDrivenScenario
+/// A proto object representing a TableDrivenScenario
 type ProtoTableDrivenScenario struct {
-	// / Scenario under Table driven execution
-	Scenario *ProtoScenario `protobuf:"bytes,1,opt,name=scenario" json:"scenario,omitempty"`
-	// / Row Index of data table against which the current scenario is executed
-	TableRowIndex int32 `protobuf:"varint,2,opt,name=tableRowIndex" json:"tableRowIndex,omitempty"`
+	/// Scenario under Table driven execution
+	Scenario *ProtoScenario `protobuf:"bytes,1,opt,name=scenario,proto3" json:"scenario,omitempty"`
+	/// Row Index of data table against which the current scenario is executed
+	TableRowIndex int32 `protobuf:"varint,2,opt,name=tableRowIndex,proto3" json:"tableRowIndex,omitempty"`
+	/// Row Index of scenario data table against which the current scenario is executed
+	ScenarioTableRowIndex int32 `protobuf:"varint,3,opt,name=scenarioTableRowIndex,proto3" json:"scenarioTableRowIndex,omitempty"`
+	/// Executed against a spec data table
+	IsSpecTableDriven bool `protobuf:"varint,4,opt,name=isSpecTableDriven,proto3" json:"isSpecTableDriven,omitempty"`
+	/// Executed against a scenario data table
+	IsScenarioTableDriven bool `protobuf:"varint,5,opt,name=isScenarioTableDriven,proto3" json:"isScenarioTableDriven,omitempty"`
+	/// Holds the scenario data table
+	ScenarioDataTable *ProtoTable `protobuf:"bytes,6,opt,name=scenarioDataTable,proto3" json:"scenarioDataTable,omitempty"`
+	/// Hold the row of scenario data table.
+	ScenarioTableRow     *ProtoTable `protobuf:"bytes,7,opt,name=scenarioTableRow,proto3" json:"scenarioTableRow,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *ProtoTableDrivenScenario) Reset()                    { *m = ProtoTableDrivenScenario{} }
-func (m *ProtoTableDrivenScenario) String() string            { return proto.CompactTextString(m) }
-func (*ProtoTableDrivenScenario) ProtoMessage()               {}
-func (*ProtoTableDrivenScenario) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{4} }
+func (m *ProtoTableDrivenScenario) Reset()         { *m = ProtoTableDrivenScenario{} }
+func (m *ProtoTableDrivenScenario) String() string { return proto.CompactTextString(m) }
+func (*ProtoTableDrivenScenario) ProtoMessage()    {}
+func (*ProtoTableDrivenScenario) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{4}
+}
+
+func (m *ProtoTableDrivenScenario) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoTableDrivenScenario.Unmarshal(m, b)
+}
+func (m *ProtoTableDrivenScenario) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoTableDrivenScenario.Marshal(b, m, deterministic)
+}
+func (m *ProtoTableDrivenScenario) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoTableDrivenScenario.Merge(m, src)
+}
+func (m *ProtoTableDrivenScenario) XXX_Size() int {
+	return xxx_messageInfo_ProtoTableDrivenScenario.Size(m)
+}
+func (m *ProtoTableDrivenScenario) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoTableDrivenScenario.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoTableDrivenScenario proto.InternalMessageInfo
 
 func (m *ProtoTableDrivenScenario) GetScenario() *ProtoScenario {
 	if m != nil {
@@ -603,26 +820,88 @@ func (m *ProtoTableDrivenScenario) GetTableRowIndex() int32 {
 	return 0
 }
 
-// / A proto object representing a Step
-type ProtoStep struct {
-	// / Holds the raw text of the Step as defined in the spec file. This contains the actual parameter values.
-	ActualText string `protobuf:"bytes,1,opt,name=actualText" json:"actualText,omitempty"`
-	// / Contains the parsed text of the Step. This will have placeholders for the parameters.
-	ParsedText string `protobuf:"bytes,2,opt,name=parsedText" json:"parsedText,omitempty"`
-	// / Collection of a list of fragments for a Step. A fragment could be either text or parameter.
-	Fragments []*Fragment `protobuf:"bytes,3,rep,name=fragments" json:"fragments,omitempty"`
-	// / Holds the result from the execution.
-	StepExecutionResult *ProtoStepExecutionResult `protobuf:"bytes,4,opt,name=stepExecutionResult" json:"stepExecutionResult,omitempty"`
-	// / Additional information at pre hook exec time to be available on reports
-	PreHookMessages []string `protobuf:"bytes,5,rep,name=preHookMessages" json:"preHookMessages,omitempty"`
-	// / Additional information at post hook exec time to be available on reports
-	PostHookMessages []string `protobuf:"bytes,6,rep,name=postHookMessages" json:"postHookMessages,omitempty"`
+func (m *ProtoTableDrivenScenario) GetScenarioTableRowIndex() int32 {
+	if m != nil {
+		return m.ScenarioTableRowIndex
+	}
+	return 0
 }
 
-func (m *ProtoStep) Reset()                    { *m = ProtoStep{} }
-func (m *ProtoStep) String() string            { return proto.CompactTextString(m) }
-func (*ProtoStep) ProtoMessage()               {}
-func (*ProtoStep) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{5} }
+func (m *ProtoTableDrivenScenario) GetIsSpecTableDriven() bool {
+	if m != nil {
+		return m.IsSpecTableDriven
+	}
+	return false
+}
+
+func (m *ProtoTableDrivenScenario) GetIsScenarioTableDriven() bool {
+	if m != nil {
+		return m.IsScenarioTableDriven
+	}
+	return false
+}
+
+func (m *ProtoTableDrivenScenario) GetScenarioDataTable() *ProtoTable {
+	if m != nil {
+		return m.ScenarioDataTable
+	}
+	return nil
+}
+
+func (m *ProtoTableDrivenScenario) GetScenarioTableRow() *ProtoTable {
+	if m != nil {
+		return m.ScenarioTableRow
+	}
+	return nil
+}
+
+/// A proto object representing a Step
+type ProtoStep struct {
+	/// Holds the raw text of the Step as defined in the spec file. This contains the actual parameter values.
+	ActualText string `protobuf:"bytes,1,opt,name=actualText,proto3" json:"actualText,omitempty"`
+	/// Contains the parsed text of the Step. This will have placeholders for the parameters.
+	ParsedText string `protobuf:"bytes,2,opt,name=parsedText,proto3" json:"parsedText,omitempty"`
+	/// Collection of a list of fragments for a Step. A fragment could be either text or parameter.
+	Fragments []*Fragment `protobuf:"bytes,3,rep,name=fragments,proto3" json:"fragments,omitempty"`
+	/// Holds the result from the execution.
+	StepExecutionResult *ProtoStepExecutionResult `protobuf:"bytes,4,opt,name=stepExecutionResult,proto3" json:"stepExecutionResult,omitempty"`
+	/// Additional information at pre hook exec time to be available on reports
+	PreHookMessages []string `protobuf:"bytes,5,rep,name=preHookMessages,proto3" json:"preHookMessages,omitempty"`
+	/// Additional information at post hook exec time to be available on reports
+	PostHookMessages []string `protobuf:"bytes,6,rep,name=postHookMessages,proto3" json:"postHookMessages,omitempty"`
+	/// Capture Screenshot at pre hook exec time to be available on reports
+	PreHookScreenshots [][]byte `protobuf:"bytes,7,rep,name=preHookScreenshots,proto3" json:"preHookScreenshots,omitempty"`
+	/// Capture Screenshot at post hook exec time to be available on reports
+	PostHookScreenshots  [][]byte `protobuf:"bytes,8,rep,name=postHookScreenshots,proto3" json:"postHookScreenshots,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoStep) Reset()         { *m = ProtoStep{} }
+func (m *ProtoStep) String() string { return proto.CompactTextString(m) }
+func (*ProtoStep) ProtoMessage()    {}
+func (*ProtoStep) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{5}
+}
+
+func (m *ProtoStep) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoStep.Unmarshal(m, b)
+}
+func (m *ProtoStep) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoStep.Marshal(b, m, deterministic)
+}
+func (m *ProtoStep) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoStep.Merge(m, src)
+}
+func (m *ProtoStep) XXX_Size() int {
+	return xxx_messageInfo_ProtoStep.Size(m)
+}
+func (m *ProtoStep) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoStep.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoStep proto.InternalMessageInfo
 
 func (m *ProtoStep) GetActualText() string {
 	if m != nil {
@@ -666,22 +945,59 @@ func (m *ProtoStep) GetPostHookMessages() []string {
 	return nil
 }
 
-// / Concept is a type of step, that can have multiple Steps.
-// / But from a caller's perspective, it is still used as any other Step
-// / A proto object representing a Concept
-type ProtoConcept struct {
-	// / Represents the Step value of a Concept.
-	ConceptStep *ProtoStep `protobuf:"bytes,1,opt,name=conceptStep" json:"conceptStep,omitempty"`
-	// / Collection of Steps in the given concepts.
-	Steps []*ProtoItem `protobuf:"bytes,2,rep,name=steps" json:"steps,omitempty"`
-	// / Holds the execution result.
-	ConceptExecutionResult *ProtoStepExecutionResult `protobuf:"bytes,3,opt,name=conceptExecutionResult" json:"conceptExecutionResult,omitempty"`
+func (m *ProtoStep) GetPreHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PreHookScreenshots
+	}
+	return nil
 }
 
-func (m *ProtoConcept) Reset()                    { *m = ProtoConcept{} }
-func (m *ProtoConcept) String() string            { return proto.CompactTextString(m) }
-func (*ProtoConcept) ProtoMessage()               {}
-func (*ProtoConcept) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{6} }
+func (m *ProtoStep) GetPostHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PostHookScreenshots
+	}
+	return nil
+}
+
+/// Concept is a type of step, that can have multiple Steps.
+/// But from a caller's perspective, it is still used as any other Step
+/// A proto object representing a Concept
+type ProtoConcept struct {
+	/// Represents the Step value of a Concept.
+	ConceptStep *ProtoStep `protobuf:"bytes,1,opt,name=conceptStep,proto3" json:"conceptStep,omitempty"`
+	/// Collection of Steps in the given concepts.
+	Steps []*ProtoItem `protobuf:"bytes,2,rep,name=steps,proto3" json:"steps,omitempty"`
+	/// Holds the execution result.
+	ConceptExecutionResult *ProtoStepExecutionResult `protobuf:"bytes,3,opt,name=conceptExecutionResult,proto3" json:"conceptExecutionResult,omitempty"`
+	XXX_NoUnkeyedLiteral   struct{}                  `json:"-"`
+	XXX_unrecognized       []byte                    `json:"-"`
+	XXX_sizecache          int32                     `json:"-"`
+}
+
+func (m *ProtoConcept) Reset()         { *m = ProtoConcept{} }
+func (m *ProtoConcept) String() string { return proto.CompactTextString(m) }
+func (*ProtoConcept) ProtoMessage()    {}
+func (*ProtoConcept) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{6}
+}
+
+func (m *ProtoConcept) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoConcept.Unmarshal(m, b)
+}
+func (m *ProtoConcept) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoConcept.Marshal(b, m, deterministic)
+}
+func (m *ProtoConcept) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoConcept.Merge(m, src)
+}
+func (m *ProtoConcept) XXX_Size() int {
+	return xxx_messageInfo_ProtoConcept.Size(m)
+}
+func (m *ProtoConcept) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoConcept.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoConcept proto.InternalMessageInfo
 
 func (m *ProtoConcept) GetConceptStep() *ProtoStep {
 	if m != nil {
@@ -704,16 +1020,39 @@ func (m *ProtoConcept) GetConceptExecutionResult() *ProtoStepExecutionResult {
 	return nil
 }
 
-// / A proto object representing Tags
+/// A proto object representing Tags
 type ProtoTags struct {
-	// / A collection of Tags
-	Tags []string `protobuf:"bytes,1,rep,name=tags" json:"tags,omitempty"`
+	/// A collection of Tags
+	Tags                 []string `protobuf:"bytes,1,rep,name=tags,proto3" json:"tags,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ProtoTags) Reset()                    { *m = ProtoTags{} }
-func (m *ProtoTags) String() string            { return proto.CompactTextString(m) }
-func (*ProtoTags) ProtoMessage()               {}
-func (*ProtoTags) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{7} }
+func (m *ProtoTags) Reset()         { *m = ProtoTags{} }
+func (m *ProtoTags) String() string { return proto.CompactTextString(m) }
+func (*ProtoTags) ProtoMessage()    {}
+func (*ProtoTags) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{7}
+}
+
+func (m *ProtoTags) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoTags.Unmarshal(m, b)
+}
+func (m *ProtoTags) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoTags.Marshal(b, m, deterministic)
+}
+func (m *ProtoTags) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoTags.Merge(m, src)
+}
+func (m *ProtoTags) XXX_Size() int {
+	return xxx_messageInfo_ProtoTags.Size(m)
+}
+func (m *ProtoTags) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoTags.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoTags proto.InternalMessageInfo
 
 func (m *ProtoTags) GetTags() []string {
 	if m != nil {
@@ -722,21 +1061,44 @@ func (m *ProtoTags) GetTags() []string {
 	return nil
 }
 
-// / A proto object representing Fragment.
-// / Fragments, put together make up A Step
+/// A proto object representing Fragment.
+/// Fragments, put together make up A Step
 type Fragment struct {
-	// / Type of Fragment, valid values are Text, Parameter
-	FragmentType Fragment_FragmentType `protobuf:"varint,1,opt,name=fragmentType,enum=gauge.messages.Fragment_FragmentType" json:"fragmentType,omitempty"`
-	// / Text part of the Fragment, valid only if FragmentType=Text
-	Text string `protobuf:"bytes,2,opt,name=text" json:"text,omitempty"`
-	// / Parameter part of the Fragment, valid only if FragmentType=Parameter
-	Parameter *Parameter `protobuf:"bytes,3,opt,name=parameter" json:"parameter,omitempty"`
+	/// Type of Fragment, valid values are Text, Parameter
+	FragmentType Fragment_FragmentType `protobuf:"varint,1,opt,name=fragmentType,proto3,enum=gauge.messages.Fragment_FragmentType" json:"fragmentType,omitempty"`
+	/// Text part of the Fragment, valid only if FragmentType=Text
+	Text string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	/// Parameter part of the Fragment, valid only if FragmentType=Parameter
+	Parameter            *Parameter `protobuf:"bytes,3,opt,name=parameter,proto3" json:"parameter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
 }
 
-func (m *Fragment) Reset()                    { *m = Fragment{} }
-func (m *Fragment) String() string            { return proto.CompactTextString(m) }
-func (*Fragment) ProtoMessage()               {}
-func (*Fragment) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{8} }
+func (m *Fragment) Reset()         { *m = Fragment{} }
+func (m *Fragment) String() string { return proto.CompactTextString(m) }
+func (*Fragment) ProtoMessage()    {}
+func (*Fragment) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{8}
+}
+
+func (m *Fragment) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Fragment.Unmarshal(m, b)
+}
+func (m *Fragment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Fragment.Marshal(b, m, deterministic)
+}
+func (m *Fragment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Fragment.Merge(m, src)
+}
+func (m *Fragment) XXX_Size() int {
+	return xxx_messageInfo_Fragment.Size(m)
+}
+func (m *Fragment) XXX_DiscardUnknown() {
+	xxx_messageInfo_Fragment.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Fragment proto.InternalMessageInfo
 
 func (m *Fragment) GetFragmentType() Fragment_FragmentType {
 	if m != nil {
@@ -759,22 +1121,45 @@ func (m *Fragment) GetParameter() *Parameter {
 	return nil
 }
 
-// / A proto object representing Fragment.
+/// A proto object representing Fragment.
 type Parameter struct {
-	// / Type of the Parameter. Valid values: Static, Dynamic, Special_String, Special_Table, Table
-	ParameterType Parameter_ParameterType `protobuf:"varint,1,opt,name=parameterType,enum=gauge.messages.Parameter_ParameterType" json:"parameterType,omitempty"`
-	// / Holds the value of the parameter
-	Value string `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	// / Holds the name of the parameter, used as Key to lookup the value.
-	Name string `protobuf:"bytes,3,opt,name=name" json:"name,omitempty"`
-	// / Holds the table value, if parameterType=Table or Special_Table
-	Table *ProtoTable `protobuf:"bytes,4,opt,name=table" json:"table,omitempty"`
+	/// Type of the Parameter. Valid values: Static, Dynamic, Special_String, Special_Table, Table
+	ParameterType Parameter_ParameterType `protobuf:"varint,1,opt,name=parameterType,proto3,enum=gauge.messages.Parameter_ParameterType" json:"parameterType,omitempty"`
+	/// Holds the value of the parameter
+	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	/// Holds the name of the parameter, used as Key to lookup the value.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	/// Holds the table value, if parameterType=Table or Special_Table
+	Table                *ProtoTable `protobuf:"bytes,4,opt,name=table,proto3" json:"table,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *Parameter) Reset()                    { *m = Parameter{} }
-func (m *Parameter) String() string            { return proto.CompactTextString(m) }
-func (*Parameter) ProtoMessage()               {}
-func (*Parameter) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{9} }
+func (m *Parameter) Reset()         { *m = Parameter{} }
+func (m *Parameter) String() string { return proto.CompactTextString(m) }
+func (*Parameter) ProtoMessage()    {}
+func (*Parameter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{9}
+}
+
+func (m *Parameter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Parameter.Unmarshal(m, b)
+}
+func (m *Parameter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Parameter.Marshal(b, m, deterministic)
+}
+func (m *Parameter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Parameter.Merge(m, src)
+}
+func (m *Parameter) XXX_Size() int {
+	return xxx_messageInfo_Parameter.Size(m)
+}
+func (m *Parameter) XXX_DiscardUnknown() {
+	xxx_messageInfo_Parameter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Parameter proto.InternalMessageInfo
 
 func (m *Parameter) GetParameterType() Parameter_ParameterType {
 	if m != nil {
@@ -804,16 +1189,39 @@ func (m *Parameter) GetTable() *ProtoTable {
 	return nil
 }
 
-// / A proto object representing Comment.
+/// A proto object representing Comment.
 type ProtoComment struct {
-	// / Text representing the Comment.
-	Text string `protobuf:"bytes,1,opt,name=text" json:"text,omitempty"`
+	/// Text representing the Comment.
+	Text                 string   `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ProtoComment) Reset()                    { *m = ProtoComment{} }
-func (m *ProtoComment) String() string            { return proto.CompactTextString(m) }
-func (*ProtoComment) ProtoMessage()               {}
-func (*ProtoComment) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{10} }
+func (m *ProtoComment) Reset()         { *m = ProtoComment{} }
+func (m *ProtoComment) String() string { return proto.CompactTextString(m) }
+func (*ProtoComment) ProtoMessage()    {}
+func (*ProtoComment) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{10}
+}
+
+func (m *ProtoComment) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoComment.Unmarshal(m, b)
+}
+func (m *ProtoComment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoComment.Marshal(b, m, deterministic)
+}
+func (m *ProtoComment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoComment.Merge(m, src)
+}
+func (m *ProtoComment) XXX_Size() int {
+	return xxx_messageInfo_ProtoComment.Size(m)
+}
+func (m *ProtoComment) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoComment.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoComment proto.InternalMessageInfo
 
 func (m *ProtoComment) GetText() string {
 	if m != nil {
@@ -822,18 +1230,41 @@ func (m *ProtoComment) GetText() string {
 	return ""
 }
 
-// / A proto object representing Table.
+/// A proto object representing Table.
 type ProtoTable struct {
-	// / Contains the Headers for the table
-	Headers *ProtoTableRow `protobuf:"bytes,1,opt,name=headers" json:"headers,omitempty"`
-	// / Contains the Rows for the table
-	Rows []*ProtoTableRow `protobuf:"bytes,2,rep,name=rows" json:"rows,omitempty"`
+	/// Contains the Headers for the table
+	Headers *ProtoTableRow `protobuf:"bytes,1,opt,name=headers,proto3" json:"headers,omitempty"`
+	/// Contains the Rows for the table
+	Rows                 []*ProtoTableRow `protobuf:"bytes,2,rep,name=rows,proto3" json:"rows,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
-func (m *ProtoTable) Reset()                    { *m = ProtoTable{} }
-func (m *ProtoTable) String() string            { return proto.CompactTextString(m) }
-func (*ProtoTable) ProtoMessage()               {}
-func (*ProtoTable) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{11} }
+func (m *ProtoTable) Reset()         { *m = ProtoTable{} }
+func (m *ProtoTable) String() string { return proto.CompactTextString(m) }
+func (*ProtoTable) ProtoMessage()    {}
+func (*ProtoTable) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{11}
+}
+
+func (m *ProtoTable) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoTable.Unmarshal(m, b)
+}
+func (m *ProtoTable) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoTable.Marshal(b, m, deterministic)
+}
+func (m *ProtoTable) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoTable.Merge(m, src)
+}
+func (m *ProtoTable) XXX_Size() int {
+	return xxx_messageInfo_ProtoTable.Size(m)
+}
+func (m *ProtoTable) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoTable.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoTable proto.InternalMessageInfo
 
 func (m *ProtoTable) GetHeaders() *ProtoTableRow {
 	if m != nil {
@@ -849,16 +1280,39 @@ func (m *ProtoTable) GetRows() []*ProtoTableRow {
 	return nil
 }
 
-// / A proto object representing Table.
+/// A proto object representing Table.
 type ProtoTableRow struct {
-	// / Represents the cells of a given table
-	Cells []string `protobuf:"bytes,1,rep,name=cells" json:"cells,omitempty"`
+	/// Represents the cells of a given table
+	Cells                []string `protobuf:"bytes,1,rep,name=cells,proto3" json:"cells,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ProtoTableRow) Reset()                    { *m = ProtoTableRow{} }
-func (m *ProtoTableRow) String() string            { return proto.CompactTextString(m) }
-func (*ProtoTableRow) ProtoMessage()               {}
-func (*ProtoTableRow) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{12} }
+func (m *ProtoTableRow) Reset()         { *m = ProtoTableRow{} }
+func (m *ProtoTableRow) String() string { return proto.CompactTextString(m) }
+func (*ProtoTableRow) ProtoMessage()    {}
+func (*ProtoTableRow) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{12}
+}
+
+func (m *ProtoTableRow) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoTableRow.Unmarshal(m, b)
+}
+func (m *ProtoTableRow) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoTableRow.Marshal(b, m, deterministic)
+}
+func (m *ProtoTableRow) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoTableRow.Merge(m, src)
+}
+func (m *ProtoTableRow) XXX_Size() int {
+	return xxx_messageInfo_ProtoTableRow.Size(m)
+}
+func (m *ProtoTableRow) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoTableRow.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoTableRow proto.InternalMessageInfo
 
 func (m *ProtoTableRow) GetCells() []string {
 	if m != nil {
@@ -867,22 +1321,45 @@ func (m *ProtoTableRow) GetCells() []string {
 	return nil
 }
 
-// / A proto object representing Step Execution result
+/// A proto object representing Step Execution result
 type ProtoStepExecutionResult struct {
-	// / The actual result of the execution
-	ExecutionResult *ProtoExecutionResult `protobuf:"bytes,1,opt,name=executionResult" json:"executionResult,omitempty"`
-	// / Contains a 'before' hook failure message. This happens when the `before_step` hook has an error.
-	PreHookFailure *ProtoHookFailure `protobuf:"bytes,2,opt,name=preHookFailure" json:"preHookFailure,omitempty"`
-	// / Contains a 'after' hook failure message. This happens when the `after_step` hook has an error.
-	PostHookFailure *ProtoHookFailure `protobuf:"bytes,3,opt,name=postHookFailure" json:"postHookFailure,omitempty"`
-	Skipped         bool              `protobuf:"varint,4,opt,name=skipped" json:"skipped,omitempty"`
-	SkippedReason   string            `protobuf:"bytes,5,opt,name=skippedReason" json:"skippedReason,omitempty"`
+	/// The actual result of the execution
+	ExecutionResult *ProtoExecutionResult `protobuf:"bytes,1,opt,name=executionResult,proto3" json:"executionResult,omitempty"`
+	/// Contains a 'before' hook failure message. This happens when the `before_step` hook has an error.
+	PreHookFailure *ProtoHookFailure `protobuf:"bytes,2,opt,name=preHookFailure,proto3" json:"preHookFailure,omitempty"`
+	/// Contains a 'after' hook failure message. This happens when the `after_step` hook has an error.
+	PostHookFailure      *ProtoHookFailure `protobuf:"bytes,3,opt,name=postHookFailure,proto3" json:"postHookFailure,omitempty"`
+	Skipped              bool              `protobuf:"varint,4,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	SkippedReason        string            `protobuf:"bytes,5,opt,name=skippedReason,proto3" json:"skippedReason,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *ProtoStepExecutionResult) Reset()                    { *m = ProtoStepExecutionResult{} }
-func (m *ProtoStepExecutionResult) String() string            { return proto.CompactTextString(m) }
-func (*ProtoStepExecutionResult) ProtoMessage()               {}
-func (*ProtoStepExecutionResult) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{13} }
+func (m *ProtoStepExecutionResult) Reset()         { *m = ProtoStepExecutionResult{} }
+func (m *ProtoStepExecutionResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoStepExecutionResult) ProtoMessage()    {}
+func (*ProtoStepExecutionResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{13}
+}
+
+func (m *ProtoStepExecutionResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoStepExecutionResult.Unmarshal(m, b)
+}
+func (m *ProtoStepExecutionResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoStepExecutionResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoStepExecutionResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoStepExecutionResult.Merge(m, src)
+}
+func (m *ProtoStepExecutionResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoStepExecutionResult.Size(m)
+}
+func (m *ProtoStepExecutionResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoStepExecutionResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoStepExecutionResult proto.InternalMessageInfo
 
 func (m *ProtoStepExecutionResult) GetExecutionResult() *ProtoExecutionResult {
 	if m != nil {
@@ -919,30 +1396,57 @@ func (m *ProtoStepExecutionResult) GetSkippedReason() string {
 	return ""
 }
 
-// / A proto object representing the result of an execution
+/// A proto object representing the result of an execution
 type ProtoExecutionResult struct {
-	// / Flag to indicate failure
-	Failed bool `protobuf:"varint,1,opt,name=failed" json:"failed,omitempty"`
-	// / Flag to indicate if the error is recoverable from.
-	RecoverableError bool `protobuf:"varint,2,opt,name=recoverableError" json:"recoverableError,omitempty"`
-	// / The actual error message.
-	ErrorMessage string `protobuf:"bytes,3,opt,name=errorMessage" json:"errorMessage,omitempty"`
-	// / Stacktrace of the error
-	StackTrace string `protobuf:"bytes,4,opt,name=stackTrace" json:"stackTrace,omitempty"`
-	// / Byte array containing screenshot taken at the time of failure.
-	ScreenShot []byte `protobuf:"bytes,5,opt,name=screenShot,proto3" json:"screenShot,omitempty"`
-	// / Holds the time taken for executing this scenario.
-	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime" json:"executionTime,omitempty"`
-	// / Additional information at exec time to be available on reports
-	Message []string `protobuf:"bytes,7,rep,name=message" json:"message,omitempty"`
-	// / Type of the Error. Valid values: ASSERTION, VERIFICATION. Default: ASSERTION
-	ErrorType ProtoExecutionResult_ErrorType `protobuf:"varint,8,opt,name=errorType,enum=gauge.messages.ProtoExecutionResult_ErrorType" json:"errorType,omitempty"`
+	/// Flag to indicate failure
+	Failed bool `protobuf:"varint,1,opt,name=failed,proto3" json:"failed,omitempty"`
+	/// Flag to indicate if the error is recoverable from.
+	RecoverableError bool `protobuf:"varint,2,opt,name=recoverableError,proto3" json:"recoverableError,omitempty"`
+	/// The actual error message.
+	ErrorMessage string `protobuf:"bytes,3,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
+	/// Stacktrace of the error
+	StackTrace string `protobuf:"bytes,4,opt,name=stackTrace,proto3" json:"stackTrace,omitempty"`
+	/// [DEPRECATED, use failedScreenshot] Bytes containing screenshot taken at the time of failure.
+	ScreenShot []byte `protobuf:"bytes,5,opt,name=screenShot,proto3" json:"screenShot,omitempty"` // Deprecated: Do not use.
+	/// Holds the time taken for executing this scenario.
+	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Additional information at exec time to be available on reports
+	Message []string `protobuf:"bytes,7,rep,name=message,proto3" json:"message,omitempty"`
+	/// Type of the Error. Valid values: ASSERTION, VERIFICATION. Default: ASSERTION
+	ErrorType ProtoExecutionResult_ErrorType `protobuf:"varint,8,opt,name=errorType,proto3,enum=gauge.messages.ProtoExecutionResult_ErrorType" json:"errorType,omitempty"`
+	/// Bytes containing screenshot taken at the time of failure.
+	FailureScreenshot []byte `protobuf:"bytes,9,opt,name=failureScreenshot,proto3" json:"failureScreenshot,omitempty"`
+	/// Bytes array containing screenshots at the time of it invoked
+	Screenshots          [][]byte `protobuf:"bytes,10,rep,name=screenshots,proto3" json:"screenshots,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ProtoExecutionResult) Reset()                    { *m = ProtoExecutionResult{} }
-func (m *ProtoExecutionResult) String() string            { return proto.CompactTextString(m) }
-func (*ProtoExecutionResult) ProtoMessage()               {}
-func (*ProtoExecutionResult) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{14} }
+func (m *ProtoExecutionResult) Reset()         { *m = ProtoExecutionResult{} }
+func (m *ProtoExecutionResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoExecutionResult) ProtoMessage()    {}
+func (*ProtoExecutionResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{14}
+}
+
+func (m *ProtoExecutionResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoExecutionResult.Unmarshal(m, b)
+}
+func (m *ProtoExecutionResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoExecutionResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoExecutionResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoExecutionResult.Merge(m, src)
+}
+func (m *ProtoExecutionResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoExecutionResult.Size(m)
+}
+func (m *ProtoExecutionResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoExecutionResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoExecutionResult proto.InternalMessageInfo
 
 func (m *ProtoExecutionResult) GetFailed() bool {
 	if m != nil {
@@ -972,6 +1476,7 @@ func (m *ProtoExecutionResult) GetStackTrace() string {
 	return ""
 }
 
+// Deprecated: Do not use.
 func (m *ProtoExecutionResult) GetScreenShot() []byte {
 	if m != nil {
 		return m.ScreenShot
@@ -1000,23 +1505,62 @@ func (m *ProtoExecutionResult) GetErrorType() ProtoExecutionResult_ErrorType {
 	return ProtoExecutionResult_ASSERTION
 }
 
-// / A proto object representing a pre-hook failure.
-// / Used to hold failure information for before_suite, before_spec, before_scenario and before_spec hooks.
-type ProtoHookFailure struct {
-	// / Stacktrace from the failure
-	StackTrace string `protobuf:"bytes,1,opt,name=stackTrace" json:"stackTrace,omitempty"`
-	// / Error message from the failure
-	ErrorMessage string `protobuf:"bytes,2,opt,name=errorMessage" json:"errorMessage,omitempty"`
-	// / Byte array holding the screenshot taken at the time of failure.
-	ScreenShot []byte `protobuf:"bytes,3,opt,name=screenShot,proto3" json:"screenShot,omitempty"`
-	// / Contains table row index corresponding to datatable rows
-	TableRowIndex int32 `protobuf:"varint,4,opt,name=tableRowIndex" json:"tableRowIndex,omitempty"`
+func (m *ProtoExecutionResult) GetFailureScreenshot() []byte {
+	if m != nil {
+		return m.FailureScreenshot
+	}
+	return nil
 }
 
-func (m *ProtoHookFailure) Reset()                    { *m = ProtoHookFailure{} }
-func (m *ProtoHookFailure) String() string            { return proto.CompactTextString(m) }
-func (*ProtoHookFailure) ProtoMessage()               {}
-func (*ProtoHookFailure) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{15} }
+func (m *ProtoExecutionResult) GetScreenshots() [][]byte {
+	if m != nil {
+		return m.Screenshots
+	}
+	return nil
+}
+
+/// A proto object representing a pre-hook failure.
+/// Used to hold failure information for before_suite, before_spec, before_scenario and before_spec hooks.
+type ProtoHookFailure struct {
+	/// Stacktrace from the failure
+	StackTrace string `protobuf:"bytes,1,opt,name=stackTrace,proto3" json:"stackTrace,omitempty"`
+	/// Error message from the failure
+	ErrorMessage string `protobuf:"bytes,2,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
+	/// [DEPRECATED, use failedScreenshot] Bytes holding the screenshot taken at the time of failure.
+	ScreenShot []byte `protobuf:"bytes,3,opt,name=screenShot,proto3" json:"screenShot,omitempty"` // Deprecated: Do not use.
+	// / Contains table row index corresponding to datatable rows
+	TableRowIndex int32 `protobuf:"varint,4,opt,name=tableRowIndex,proto3" json:"tableRowIndex,omitempty"`
+	///Bytes holding the screenshot taken at the time of failure.
+	FailureScreenshot    []byte   `protobuf:"bytes,5,opt,name=failureScreenshot,proto3" json:"failureScreenshot,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoHookFailure) Reset()         { *m = ProtoHookFailure{} }
+func (m *ProtoHookFailure) String() string { return proto.CompactTextString(m) }
+func (*ProtoHookFailure) ProtoMessage()    {}
+func (*ProtoHookFailure) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{15}
+}
+
+func (m *ProtoHookFailure) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoHookFailure.Unmarshal(m, b)
+}
+func (m *ProtoHookFailure) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoHookFailure.Marshal(b, m, deterministic)
+}
+func (m *ProtoHookFailure) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoHookFailure.Merge(m, src)
+}
+func (m *ProtoHookFailure) XXX_Size() int {
+	return xxx_messageInfo_ProtoHookFailure.Size(m)
+}
+func (m *ProtoHookFailure) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoHookFailure.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoHookFailure proto.InternalMessageInfo
 
 func (m *ProtoHookFailure) GetStackTrace() string {
 	if m != nil {
@@ -1032,6 +1576,7 @@ func (m *ProtoHookFailure) GetErrorMessage() string {
 	return ""
 }
 
+// Deprecated: Do not use.
 func (m *ProtoHookFailure) GetScreenShot() []byte {
 	if m != nil {
 		return m.ScreenShot
@@ -1046,45 +1591,83 @@ func (m *ProtoHookFailure) GetTableRowIndex() int32 {
 	return 0
 }
 
-// / A proto object representing the result of entire Suite execution.
-type ProtoSuiteResult struct {
-	// / Contains the result from the execution
-	SpecResults []*ProtoSpecResult `protobuf:"bytes,1,rep,name=specResults" json:"specResults,omitempty"`
-	// / Contains a 'before' hook failure message. This happens when the `before_suite` hook has an error
-	PreHookFailure *ProtoHookFailure `protobuf:"bytes,2,opt,name=preHookFailure" json:"preHookFailure,omitempty"`
-	// / Contains a 'after' hook failure message. This happens when the `after_suite` hook has an error
-	PostHookFailure *ProtoHookFailure `protobuf:"bytes,3,opt,name=postHookFailure" json:"postHookFailure,omitempty"`
-	// / Flag to indicate failure
-	Failed bool `protobuf:"varint,4,opt,name=failed" json:"failed,omitempty"`
-	// / Holds the count of number of Specifications that failed.
-	SpecsFailedCount int32 `protobuf:"varint,5,opt,name=specsFailedCount" json:"specsFailedCount,omitempty"`
-	// / Holds the time taken for executing the whole suite.
-	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime" json:"executionTime,omitempty"`
-	// / Holds a metric indicating the success rate of the execution.
-	SuccessRate float32 `protobuf:"fixed32,7,opt,name=successRate" json:"successRate,omitempty"`
-	// / The environment against which execution was done
-	Environment string `protobuf:"bytes,8,opt,name=environment" json:"environment,omitempty"`
-	// / Tag expression used for filtering specification
-	Tags string `protobuf:"bytes,9,opt,name=tags" json:"tags,omitempty"`
-	// / Project name
-	ProjectName string `protobuf:"bytes,10,opt,name=projectName" json:"projectName,omitempty"`
-	// / Timestamp of when execution started
-	Timestamp         string `protobuf:"bytes,11,opt,name=timestamp" json:"timestamp,omitempty"`
-	SpecsSkippedCount int32  `protobuf:"varint,12,opt,name=specsSkippedCount" json:"specsSkippedCount,omitempty"`
-	// / Additional information at pre hook exec time to be available on reports
-	PreHookMessages []string `protobuf:"bytes,13,rep,name=preHookMessages" json:"preHookMessages,omitempty"`
-	// / Additional information at post hook exec time to be available on reports
-	PostHookMessages []string `protobuf:"bytes,14,rep,name=postHookMessages" json:"postHookMessages,omitempty"`
-	// / [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
-	PreHookMessage []string `protobuf:"bytes,15,rep,name=preHookMessage" json:"preHookMessage,omitempty"`
-	// / [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
-	PostHookMessage []string `protobuf:"bytes,16,rep,name=postHookMessage" json:"postHookMessage,omitempty"`
+func (m *ProtoHookFailure) GetFailureScreenshot() []byte {
+	if m != nil {
+		return m.FailureScreenshot
+	}
+	return nil
 }
 
-func (m *ProtoSuiteResult) Reset()                    { *m = ProtoSuiteResult{} }
-func (m *ProtoSuiteResult) String() string            { return proto.CompactTextString(m) }
-func (*ProtoSuiteResult) ProtoMessage()               {}
-func (*ProtoSuiteResult) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{16} }
+/// A proto object representing the result of entire Suite execution.
+type ProtoSuiteResult struct {
+	/// Contains the result from the execution
+	SpecResults []*ProtoSpecResult `protobuf:"bytes,1,rep,name=specResults,proto3" json:"specResults,omitempty"`
+	/// Contains a 'before' hook failure message. This happens when the `before_suite` hook has an error
+	PreHookFailure *ProtoHookFailure `protobuf:"bytes,2,opt,name=preHookFailure,proto3" json:"preHookFailure,omitempty"`
+	/// Contains a 'after' hook failure message. This happens when the `after_suite` hook has an error
+	PostHookFailure *ProtoHookFailure `protobuf:"bytes,3,opt,name=postHookFailure,proto3" json:"postHookFailure,omitempty"`
+	/// Flag to indicate failure
+	Failed bool `protobuf:"varint,4,opt,name=failed,proto3" json:"failed,omitempty"`
+	/// Holds the count of number of Specifications that failed.
+	SpecsFailedCount int32 `protobuf:"varint,5,opt,name=specsFailedCount,proto3" json:"specsFailedCount,omitempty"`
+	/// Holds the time taken for executing the whole suite.
+	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Holds a metric indicating the success rate of the execution.
+	SuccessRate float32 `protobuf:"fixed32,7,opt,name=successRate,proto3" json:"successRate,omitempty"`
+	/// The environment against which execution was done
+	Environment string `protobuf:"bytes,8,opt,name=environment,proto3" json:"environment,omitempty"`
+	/// Tag expression used for filtering specification
+	Tags string `protobuf:"bytes,9,opt,name=tags,proto3" json:"tags,omitempty"`
+	/// Project name
+	ProjectName string `protobuf:"bytes,10,opt,name=projectName,proto3" json:"projectName,omitempty"`
+	/// Timestamp of when execution started
+	Timestamp         string `protobuf:"bytes,11,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	SpecsSkippedCount int32  `protobuf:"varint,12,opt,name=specsSkippedCount,proto3" json:"specsSkippedCount,omitempty"`
+	/// Additional information at pre hook exec time to be available on reports
+	PreHookMessages []string `protobuf:"bytes,13,rep,name=preHookMessages,proto3" json:"preHookMessages,omitempty"`
+	/// Additional information at post hook exec time to be available on reports
+	PostHookMessages []string `protobuf:"bytes,14,rep,name=postHookMessages,proto3" json:"postHookMessages,omitempty"`
+	/// [DEPRECATED, use preHookMessages] Additional information at pre hook exec time to be available on reports
+	PreHookMessage []string `protobuf:"bytes,15,rep,name=preHookMessage,proto3" json:"preHookMessage,omitempty"` // Deprecated: Do not use.
+	/// [DEPRECATED, use postHookMessages] Additional information at post hook exec time to be available on reports
+	PostHookMessage []string `protobuf:"bytes,16,rep,name=postHookMessage,proto3" json:"postHookMessage,omitempty"` // Deprecated: Do not use.
+	/// Capture Screenshot at pre hook exec time to be available on reports
+	PreHookScreenshots [][]byte `protobuf:"bytes,17,rep,name=preHookScreenshots,proto3" json:"preHookScreenshots,omitempty"`
+	/// Capture Screenshot at post hook exec time to be available on reports
+	PostHookScreenshots [][]byte `protobuf:"bytes,18,rep,name=postHookScreenshots,proto3" json:"postHookScreenshots,omitempty"`
+	// Indicates if the result is sent in chunks
+	Chunked bool `protobuf:"varint,19,opt,name=chunked,proto3" json:"chunked,omitempty"`
+	// Indicates the number of chunks to expect after this
+	ChunkSize            int64    `protobuf:"varint,20,opt,name=chunkSize,proto3" json:"chunkSize,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoSuiteResult) Reset()         { *m = ProtoSuiteResult{} }
+func (m *ProtoSuiteResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoSuiteResult) ProtoMessage()    {}
+func (*ProtoSuiteResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{16}
+}
+
+func (m *ProtoSuiteResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoSuiteResult.Unmarshal(m, b)
+}
+func (m *ProtoSuiteResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoSuiteResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoSuiteResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoSuiteResult.Merge(m, src)
+}
+func (m *ProtoSuiteResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoSuiteResult.Size(m)
+}
+func (m *ProtoSuiteResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoSuiteResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoSuiteResult proto.InternalMessageInfo
 
 func (m *ProtoSuiteResult) GetSpecResults() []*ProtoSpecResult {
 	if m != nil {
@@ -1184,6 +1767,7 @@ func (m *ProtoSuiteResult) GetPostHookMessages() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoSuiteResult) GetPreHookMessage() []string {
 	if m != nil {
 		return m.PreHookMessage
@@ -1191,6 +1775,7 @@ func (m *ProtoSuiteResult) GetPreHookMessage() []string {
 	return nil
 }
 
+// Deprecated: Do not use.
 func (m *ProtoSuiteResult) GetPostHookMessage() []string {
 	if m != nil {
 		return m.PostHookMessage
@@ -1198,34 +1783,87 @@ func (m *ProtoSuiteResult) GetPostHookMessage() []string {
 	return nil
 }
 
-// / A proto object representing the result of Spec execution.
-type ProtoSpecResult struct {
-	// / Represents the corresponding Specification
-	ProtoSpec *ProtoSpec `protobuf:"bytes,1,opt,name=protoSpec" json:"protoSpec,omitempty"`
-	// / Holds the number of Scenarios executed
-	ScenarioCount int32 `protobuf:"varint,2,opt,name=scenarioCount" json:"scenarioCount,omitempty"`
-	// / Holds the number of Scenarios failed
-	ScenarioFailedCount int32 `protobuf:"varint,3,opt,name=scenarioFailedCount" json:"scenarioFailedCount,omitempty"`
-	// / Flag to indicate failure
-	Failed bool `protobuf:"varint,4,opt,name=failed" json:"failed,omitempty"`
-	// / Holds the row numbers, which caused the execution to fail.
-	FailedDataTableRows []int32 `protobuf:"varint,5,rep,packed,name=failedDataTableRows" json:"failedDataTableRows,omitempty"`
-	// / Holds the time taken for executing the spec.
-	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime" json:"executionTime,omitempty"`
-	// / Flag to indicate if spec is skipped
-	Skipped bool `protobuf:"varint,7,opt,name=skipped" json:"skipped,omitempty"`
-	// / Holds the number of Scenarios skipped
-	ScenarioSkippedCount int32 `protobuf:"varint,8,opt,name=scenarioSkippedCount" json:"scenarioSkippedCount,omitempty"`
-	// / Holds the row numbers, for which the execution skipped.
-	SkippedDataTableRows []int32 `protobuf:"varint,9,rep,packed,name=skippedDataTableRows" json:"skippedDataTableRows,omitempty"`
-	// / Holds parse, validation and skipped errors.
-	Errors []*Error `protobuf:"bytes,10,rep,name=errors" json:"errors,omitempty"`
+func (m *ProtoSuiteResult) GetPreHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PreHookScreenshots
+	}
+	return nil
 }
 
-func (m *ProtoSpecResult) Reset()                    { *m = ProtoSpecResult{} }
-func (m *ProtoSpecResult) String() string            { return proto.CompactTextString(m) }
-func (*ProtoSpecResult) ProtoMessage()               {}
-func (*ProtoSpecResult) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{17} }
+func (m *ProtoSuiteResult) GetPostHookScreenshots() [][]byte {
+	if m != nil {
+		return m.PostHookScreenshots
+	}
+	return nil
+}
+
+func (m *ProtoSuiteResult) GetChunked() bool {
+	if m != nil {
+		return m.Chunked
+	}
+	return false
+}
+
+func (m *ProtoSuiteResult) GetChunkSize() int64 {
+	if m != nil {
+		return m.ChunkSize
+	}
+	return 0
+}
+
+/// A proto object representing the result of Spec execution.
+type ProtoSpecResult struct {
+	/// Represents the corresponding Specification
+	ProtoSpec *ProtoSpec `protobuf:"bytes,1,opt,name=protoSpec,proto3" json:"protoSpec,omitempty"`
+	/// Holds the number of Scenarios executed
+	ScenarioCount int32 `protobuf:"varint,2,opt,name=scenarioCount,proto3" json:"scenarioCount,omitempty"`
+	/// Holds the number of Scenarios failed
+	ScenarioFailedCount int32 `protobuf:"varint,3,opt,name=scenarioFailedCount,proto3" json:"scenarioFailedCount,omitempty"`
+	/// Flag to indicate failure
+	Failed bool `protobuf:"varint,4,opt,name=failed,proto3" json:"failed,omitempty"`
+	/// Holds the row numbers, which caused the execution to fail.
+	FailedDataTableRows []int32 `protobuf:"varint,5,rep,packed,name=failedDataTableRows,proto3" json:"failedDataTableRows,omitempty"`
+	/// Holds the time taken for executing the spec.
+	ExecutionTime int64 `protobuf:"varint,6,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Flag to indicate if spec is skipped
+	Skipped bool `protobuf:"varint,7,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	/// Holds the number of Scenarios skipped
+	ScenarioSkippedCount int32 `protobuf:"varint,8,opt,name=scenarioSkippedCount,proto3" json:"scenarioSkippedCount,omitempty"`
+	/// Holds the row numbers, for which the execution skipped.
+	SkippedDataTableRows []int32 `protobuf:"varint,9,rep,packed,name=skippedDataTableRows,proto3" json:"skippedDataTableRows,omitempty"`
+	/// Holds parse, validation and skipped errors.
+	Errors []*Error `protobuf:"bytes,10,rep,name=errors,proto3" json:"errors,omitempty"`
+	/// Holds the timestamp of event starting.
+	Timestamp            string   `protobuf:"bytes,11,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoSpecResult) Reset()         { *m = ProtoSpecResult{} }
+func (m *ProtoSpecResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoSpecResult) ProtoMessage()    {}
+func (*ProtoSpecResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{17}
+}
+
+func (m *ProtoSpecResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoSpecResult.Unmarshal(m, b)
+}
+func (m *ProtoSpecResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoSpecResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoSpecResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoSpecResult.Merge(m, src)
+}
+func (m *ProtoSpecResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoSpecResult.Size(m)
+}
+func (m *ProtoSpecResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoSpecResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoSpecResult proto.InternalMessageInfo
 
 func (m *ProtoSpecResult) GetProtoSpec() *ProtoSpec {
 	if m != nil {
@@ -1297,22 +1935,170 @@ func (m *ProtoSpecResult) GetErrors() []*Error {
 	return nil
 }
 
-// / A proto object representing an error in spec/Scenario.
-type Error struct {
-	// / Holds the type of error
-	Type Error_ErrorType `protobuf:"varint,1,opt,name=type,enum=gauge.messages.Error_ErrorType" json:"type,omitempty"`
-	// / Holds the filename.
-	Filename string `protobuf:"bytes,2,opt,name=filename" json:"filename,omitempty"`
-	// / Holds the line number of the error in file.
-	LineNumber int32 `protobuf:"varint,3,opt,name=lineNumber" json:"lineNumber,omitempty"`
-	// / Holds the error message.
-	Message string `protobuf:"bytes,4,opt,name=message" json:"message,omitempty"`
+func (m *ProtoSpecResult) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
 }
 
-func (m *Error) Reset()                    { *m = Error{} }
-func (m *Error) String() string            { return proto.CompactTextString(m) }
-func (*Error) ProtoMessage()               {}
-func (*Error) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{18} }
+/// A proto object representing the result of Scenario execution.
+type ProtoScenarioResult struct {
+	/// Collection of scenarios in scenario execution result.
+	ProtoItem *ProtoItem `protobuf:"bytes,1,opt,name=protoItem,proto3" json:"protoItem,omitempty"`
+	/// Holds the time taken for executing the whole suite.
+	ExecutionTime int64 `protobuf:"varint,2,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Holds the timestamp of event starting.
+	Timestamp            string   `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoScenarioResult) Reset()         { *m = ProtoScenarioResult{} }
+func (m *ProtoScenarioResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoScenarioResult) ProtoMessage()    {}
+func (*ProtoScenarioResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{18}
+}
+
+func (m *ProtoScenarioResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoScenarioResult.Unmarshal(m, b)
+}
+func (m *ProtoScenarioResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoScenarioResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoScenarioResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoScenarioResult.Merge(m, src)
+}
+func (m *ProtoScenarioResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoScenarioResult.Size(m)
+}
+func (m *ProtoScenarioResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoScenarioResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoScenarioResult proto.InternalMessageInfo
+
+func (m *ProtoScenarioResult) GetProtoItem() *ProtoItem {
+	if m != nil {
+		return m.ProtoItem
+	}
+	return nil
+}
+
+func (m *ProtoScenarioResult) GetExecutionTime() int64 {
+	if m != nil {
+		return m.ExecutionTime
+	}
+	return 0
+}
+
+func (m *ProtoScenarioResult) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+/// A proto object representing the result of Step execution.
+type ProtoStepResult struct {
+	/// Collection of steps in step execution result.
+	ProtoItem *ProtoItem `protobuf:"bytes,1,opt,name=protoItem,proto3" json:"protoItem,omitempty"`
+	/// Holds the time taken for executing the whole suite.
+	ExecutionTime int64 `protobuf:"varint,2,opt,name=executionTime,proto3" json:"executionTime,omitempty"`
+	/// Holds the timestamp of event starting.
+	Timestamp            string   `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProtoStepResult) Reset()         { *m = ProtoStepResult{} }
+func (m *ProtoStepResult) String() string { return proto.CompactTextString(m) }
+func (*ProtoStepResult) ProtoMessage()    {}
+func (*ProtoStepResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{19}
+}
+
+func (m *ProtoStepResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoStepResult.Unmarshal(m, b)
+}
+func (m *ProtoStepResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoStepResult.Marshal(b, m, deterministic)
+}
+func (m *ProtoStepResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoStepResult.Merge(m, src)
+}
+func (m *ProtoStepResult) XXX_Size() int {
+	return xxx_messageInfo_ProtoStepResult.Size(m)
+}
+func (m *ProtoStepResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoStepResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoStepResult proto.InternalMessageInfo
+
+func (m *ProtoStepResult) GetProtoItem() *ProtoItem {
+	if m != nil {
+		return m.ProtoItem
+	}
+	return nil
+}
+
+func (m *ProtoStepResult) GetExecutionTime() int64 {
+	if m != nil {
+		return m.ExecutionTime
+	}
+	return 0
+}
+
+func (m *ProtoStepResult) GetTimestamp() string {
+	if m != nil {
+		return m.Timestamp
+	}
+	return ""
+}
+
+/// A proto object representing an error in spec/Scenario.
+type Error struct {
+	/// Holds the type of error
+	Type Error_ErrorType `protobuf:"varint,1,opt,name=type,proto3,enum=gauge.messages.Error_ErrorType" json:"type,omitempty"`
+	/// Holds the filename.
+	Filename string `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	/// Holds the line number of the error in file.
+	LineNumber int32 `protobuf:"varint,3,opt,name=lineNumber,proto3" json:"lineNumber,omitempty"`
+	/// Holds the error message.
+	Message              string   `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Error) Reset()         { *m = Error{} }
+func (m *Error) String() string { return proto.CompactTextString(m) }
+func (*Error) ProtoMessage()    {}
+func (*Error) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{20}
+}
+
+func (m *Error) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Error.Unmarshal(m, b)
+}
+func (m *Error) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Error.Marshal(b, m, deterministic)
+}
+func (m *Error) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Error.Merge(m, src)
+}
+func (m *Error) XXX_Size() int {
+	return xxx_messageInfo_Error.Size(m)
+}
+func (m *Error) XXX_DiscardUnknown() {
+	xxx_messageInfo_Error.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Error proto.InternalMessageInfo
 
 func (m *Error) GetType() Error_ErrorType {
 	if m != nil {
@@ -1342,20 +2128,43 @@ func (m *Error) GetMessage() string {
 	return ""
 }
 
-// / A proto object representing a Step value.
+/// A proto object representing a Step value.
 type ProtoStepValue struct {
-	// / The actual string value describing he Step
-	StepValue string `protobuf:"bytes,1,opt,name=stepValue" json:"stepValue,omitempty"`
-	// / The parameterized string value describing he Step. The parameters are replaced with placeholders.
-	ParameterizedStepValue string `protobuf:"bytes,2,opt,name=parameterizedStepValue" json:"parameterizedStepValue,omitempty"`
-	// / A collection of strings representing the parameters.
-	Parameters []string `protobuf:"bytes,3,rep,name=parameters" json:"parameters,omitempty"`
+	/// The actual string value describing he Step
+	StepValue string `protobuf:"bytes,1,opt,name=stepValue,proto3" json:"stepValue,omitempty"`
+	/// The parameterized string value describing he Step. The parameters are replaced with placeholders.
+	ParameterizedStepValue string `protobuf:"bytes,2,opt,name=parameterizedStepValue,proto3" json:"parameterizedStepValue,omitempty"`
+	/// A collection of strings representing the parameters.
+	Parameters           []string `protobuf:"bytes,3,rep,name=parameters,proto3" json:"parameters,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ProtoStepValue) Reset()                    { *m = ProtoStepValue{} }
-func (m *ProtoStepValue) String() string            { return proto.CompactTextString(m) }
-func (*ProtoStepValue) ProtoMessage()               {}
-func (*ProtoStepValue) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{19} }
+func (m *ProtoStepValue) Reset()         { *m = ProtoStepValue{} }
+func (m *ProtoStepValue) String() string { return proto.CompactTextString(m) }
+func (*ProtoStepValue) ProtoMessage()    {}
+func (*ProtoStepValue) Descriptor() ([]byte, []int) {
+	return fileDescriptor_423806180556987f, []int{21}
+}
+
+func (m *ProtoStepValue) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ProtoStepValue.Unmarshal(m, b)
+}
+func (m *ProtoStepValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ProtoStepValue.Marshal(b, m, deterministic)
+}
+func (m *ProtoStepValue) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProtoStepValue.Merge(m, src)
+}
+func (m *ProtoStepValue) XXX_Size() int {
+	return xxx_messageInfo_ProtoStepValue.Size(m)
+}
+func (m *ProtoStepValue) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProtoStepValue.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProtoStepValue proto.InternalMessageInfo
 
 func (m *ProtoStepValue) GetStepValue() string {
 	if m != nil {
@@ -1379,6 +2188,12 @@ func (m *ProtoStepValue) GetParameters() []string {
 }
 
 func init() {
+	proto.RegisterEnum("gauge.messages.ExecutionStatus", ExecutionStatus_name, ExecutionStatus_value)
+	proto.RegisterEnum("gauge.messages.ProtoItem_ItemType", ProtoItem_ItemType_name, ProtoItem_ItemType_value)
+	proto.RegisterEnum("gauge.messages.Fragment_FragmentType", Fragment_FragmentType_name, Fragment_FragmentType_value)
+	proto.RegisterEnum("gauge.messages.Parameter_ParameterType", Parameter_ParameterType_name, Parameter_ParameterType_value)
+	proto.RegisterEnum("gauge.messages.ProtoExecutionResult_ErrorType", ProtoExecutionResult_ErrorType_name, ProtoExecutionResult_ErrorType_value)
+	proto.RegisterEnum("gauge.messages.Error_ErrorType", Error_ErrorType_name, Error_ErrorType_value)
 	proto.RegisterType((*ProtoSpec)(nil), "gauge.messages.ProtoSpec")
 	proto.RegisterType((*ProtoItem)(nil), "gauge.messages.ProtoItem")
 	proto.RegisterType((*ProtoScenario)(nil), "gauge.messages.ProtoScenario")
@@ -1397,133 +2212,146 @@ func init() {
 	proto.RegisterType((*ProtoHookFailure)(nil), "gauge.messages.ProtoHookFailure")
 	proto.RegisterType((*ProtoSuiteResult)(nil), "gauge.messages.ProtoSuiteResult")
 	proto.RegisterType((*ProtoSpecResult)(nil), "gauge.messages.ProtoSpecResult")
+	proto.RegisterType((*ProtoScenarioResult)(nil), "gauge.messages.ProtoScenarioResult")
+	proto.RegisterType((*ProtoStepResult)(nil), "gauge.messages.ProtoStepResult")
 	proto.RegisterType((*Error)(nil), "gauge.messages.Error")
 	proto.RegisterType((*ProtoStepValue)(nil), "gauge.messages.ProtoStepValue")
-	proto.RegisterEnum("gauge.messages.ExecutionStatus", ExecutionStatus_name, ExecutionStatus_value)
-	proto.RegisterEnum("gauge.messages.ProtoItem_ItemType", ProtoItem_ItemType_name, ProtoItem_ItemType_value)
-	proto.RegisterEnum("gauge.messages.Fragment_FragmentType", Fragment_FragmentType_name, Fragment_FragmentType_value)
-	proto.RegisterEnum("gauge.messages.Parameter_ParameterType", Parameter_ParameterType_name, Parameter_ParameterType_value)
-	proto.RegisterEnum("gauge.messages.ProtoExecutionResult_ErrorType", ProtoExecutionResult_ErrorType_name, ProtoExecutionResult_ErrorType_value)
-	proto.RegisterEnum("gauge.messages.Error_ErrorType", Error_ErrorType_name, Error_ErrorType_value)
 }
 
-func init() { proto.RegisterFile("spec.proto", fileDescriptor3) }
+func init() { proto.RegisterFile("spec.proto", fileDescriptor_423806180556987f) }
 
-var fileDescriptor3 = []byte{
-	// 1831 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x5b, 0x6f, 0x1c, 0x49,
-	0x15, 0x76, 0x5f, 0xe6, 0x76, 0xe6, 0xe2, 0x4e, 0xc5, 0x84, 0x26, 0x0a, 0xc9, 0xa8, 0xe5, 0xd5,
-	0x5a, 0x51, 0xd6, 0x04, 0xaf, 0xc8, 0x0a, 0x21, 0x81, 0xbc, 0x9e, 0xf1, 0x66, 0x20, 0xeb, 0x58,
-	0x35, 0x43, 0x84, 0xf6, 0x65, 0xa9, 0xb4, 0x2b, 0x4e, 0x6f, 0x66, 0xba, 0x47, 0xdd, 0x35, 0x89,
-	0x17, 0xde, 0xf9, 0x01, 0x3c, 0xf3, 0x0b, 0x78, 0xe7, 0x1d, 0x09, 0x89, 0x97, 0x48, 0x48, 0xfc,
-	0x01, 0x7e, 0x08, 0x0f, 0x08, 0xd5, 0xa9, 0xea, 0xeb, 0xf4, 0xc4, 0x63, 0xc4, 0xc3, 0xbe, 0x55,
-	0x9d, 0x4b, 0x75, 0x9d, 0x53, 0xa7, 0xbe, 0xf3, 0x55, 0x03, 0x24, 0x4b, 0xee, 0x1f, 0x2e, 0xe3,
-	0x48, 0x44, 0x64, 0x70, 0xc9, 0x56, 0x97, 0xfc, 0x70, 0xc1, 0x93, 0x84, 0x5d, 0xf2, 0xc4, 0xfb,
-	0x8f, 0x05, 0x9d, 0x73, 0xa9, 0x99, 0x2e, 0xb9, 0x4f, 0x86, 0xd0, 0x95, 0xb6, 0x4f, 0x39, 0xbb,
-	0x08, 0xc2, 0x4b, 0xd7, 0x18, 0x1a, 0x07, 0x1d, 0x5a, 0x14, 0x91, 0x1f, 0x41, 0x23, 0x10, 0x7c,
-	0x91, 0xb8, 0xe6, 0xd0, 0x3a, 0xe8, 0x1e, 0xfd, 0xe0, 0xb0, 0xbc, 0xde, 0x21, 0xae, 0x35, 0x11,
-	0x7c, 0x41, 0x95, 0x1d, 0xd9, 0x87, 0x7e, 0x90, 0xcc, 0xd8, 0xcb, 0x39, 0x1f, 0xc5, 0xc1, 0x5b,
-	0x1e, 0xba, 0xd6, 0xd0, 0x38, 0x68, 0xd3, 0xb2, 0x90, 0xfc, 0x12, 0x76, 0x97, 0x31, 0x7f, 0x1a,
-	0x45, 0x6f, 0x4e, 0x59, 0x30, 0x5f, 0xc5, 0x3c, 0x71, 0x6d, 0xfc, 0xc0, 0xb0, 0xf6, 0x03, 0x05,
-	0x43, 0x5a, 0x75, 0x24, 0xcf, 0xc0, 0x59, 0x46, 0x89, 0x28, 0x2d, 0xd6, 0xd8, 0x72, 0xb1, 0x35,
-	0x4f, 0x72, 0x17, 0xda, 0xaf, 0x82, 0x39, 0x3f, 0x63, 0x0b, 0xee, 0x36, 0x31, 0x1f, 0xd9, 0x9c,
-	0x10, 0xb0, 0x05, 0xbb, 0x4c, 0xdc, 0xd6, 0xd0, 0x3a, 0xe8, 0x50, 0x1c, 0x93, 0x83, 0x2c, 0x92,
-	0x2f, 0xf5, 0x57, 0xdc, 0x36, 0xaa, 0xab, 0x62, 0xf2, 0x30, 0xdf, 0x67, 0x66, 0xda, 0x41, 0xd3,
-	0x35, 0x39, 0x79, 0x08, 0x83, 0xb2, 0xbb, 0x0b, 0xd2, 0xf2, 0x73, 0xd3, 0x35, 0x68, 0x45, 0x43,
-	0x1e, 0xc1, 0x6e, 0xc5, 0xdf, 0xed, 0x66, 0xc6, 0x55, 0x95, 0xf7, 0x0f, 0x5b, 0x17, 0x80, 0x3c,
-	0x34, 0xf2, 0x73, 0x68, 0xcb, 0x63, 0x9b, 0x7d, 0xbb, 0xe4, 0x78, 0xfa, 0x83, 0x23, 0x6f, 0xe3,
-	0x09, 0x1f, 0x4e, 0xb4, 0x25, 0xcd, 0x7c, 0xc8, 0x27, 0x60, 0x27, 0x82, 0x2f, 0x5d, 0x73, 0x68,
-	0x6c, 0xac, 0x8e, 0xa9, 0xe0, 0x4b, 0x8a, 0x66, 0xe4, 0x09, 0xb4, 0xfc, 0x28, 0xf4, 0xf9, 0x52,
-	0x60, 0x59, 0x74, 0x8f, 0xee, 0xd5, 0x7a, 0x9c, 0x28, 0x1b, 0x9a, 0x1a, 0x93, 0x9f, 0x42, 0x3b,
-	0xf1, 0x79, 0xc8, 0xe2, 0x20, 0x72, 0x6d, 0x74, 0xfc, 0x61, 0xfd, 0xa7, 0xb4, 0x11, 0xcd, 0xcc,
-	0xc9, 0x57, 0x70, 0x5b, 0xe4, 0x85, 0x97, 0x1a, 0xb8, 0x0d, 0x5c, 0xe5, 0xa0, 0x76, 0x95, 0xd9,
-	0xba, 0x3d, 0xad, 0x5b, 0x44, 0x85, 0xb3, 0x58, 0xf0, 0x50, 0x60, 0xa9, 0x6c, 0x0e, 0x07, 0x6d,
-	0x68, 0x6a, 0x4c, 0x1e, 0x43, 0x03, 0x97, 0x73, 0x5b, 0xe8, 0x75, 0x77, 0xf3, 0x2e, 0xa8, 0x32,
-	0x94, 0x79, 0xc6, 0xca, 0x6b, 0x7f, 0x20, 0xcf, 0x33, 0x76, 0x99, 0xa8, 0xa2, 0xf4, 0xbe, 0x81,
-	0x76, 0x7a, 0x58, 0xa4, 0x0d, 0xb6, 0x3c, 0x01, 0x67, 0x87, 0x74, 0xa1, 0xa5, 0xb7, 0xe2, 0x18,
-	0x6a, 0x82, 0xd9, 0x75, 0x4c, 0xd2, 0x83, 0x76, 0x1a, 0x94, 0x63, 0x91, 0xef, 0xc3, 0xed, 0x9a,
-	0x14, 0x38, 0x36, 0xe9, 0x40, 0x03, 0x15, 0x4e, 0x43, 0xae, 0x2a, 0xbf, 0xe7, 0x34, 0xbd, 0x7f,
-	0x36, 0xa1, 0x5f, 0x4a, 0xbe, 0xbc, 0x12, 0x69, 0xfa, 0xcb, 0xc8, 0x52, 0x15, 0x93, 0xbb, 0xd0,
-	0x7c, 0xc5, 0x82, 0x39, 0xbf, 0xc0, 0x02, 0x6a, 0x63, 0xc5, 0x6a, 0x09, 0xf9, 0x09, 0xb4, 0xfd,
-	0x28, 0x14, 0xfc, 0x4a, 0x24, 0xae, 0x75, 0x1d, 0xf8, 0x64, 0xa6, 0xe4, 0x17, 0xd0, 0x4f, 0xbf,
-	0x32, 0x41, 0xe0, 0xb2, 0xaf, 0xf3, 0x2d, 0xdb, 0x93, 0xa7, 0xd9, 0xd5, 0xd3, 0x98, 0xa0, 0x6b,
-	0xe5, 0x7a, 0x30, 0xa9, 0xf8, 0x21, 0xc8, 0x95, 0xe1, 0x45, 0x97, 0xc9, 0x36, 0x20, 0x57, 0x76,
-	0xac, 0x85, 0x9e, 0x7d, 0xe8, 0xf3, 0x2b, 0xee, 0xaf, 0x44, 0x10, 0x85, 0xb3, 0x60, 0xc1, 0xb1,
-	0x3a, 0x2c, 0x5a, 0x16, 0x92, 0x7b, 0xd0, 0x4a, 0xde, 0x04, 0xcb, 0x25, 0xbf, 0x70, 0x3b, 0x59,
-	0x92, 0x53, 0x11, 0xb9, 0x0f, 0x20, 0x87, 0xe3, 0x38, 0x8e, 0xe2, 0x44, 0x81, 0x0c, 0x2d, 0x48,
-	0xc8, 0x00, 0xcc, 0xc9, 0xc8, 0xed, 0xe2, 0xf1, 0x99, 0x93, 0x91, 0x4c, 0xaf, 0xe0, 0x2c, 0x1e,
-	0x45, 0xef, 0x42, 0x59, 0x55, 0x89, 0xdb, 0xbb, 0x36, 0xbd, 0x25, 0x7b, 0x72, 0x00, 0x76, 0xb2,
-	0x64, 0xa1, 0xdb, 0xc7, 0x4c, 0xec, 0x55, 0xfd, 0xa6, 0x4b, 0x16, 0x52, 0xb4, 0x20, 0x13, 0xd8,
-	0xcd, 0x22, 0x99, 0x0a, 0x26, 0x56, 0x89, 0x3b, 0x40, 0x88, 0x7a, 0x50, 0x75, 0x1a, 0x97, 0xcd,
-	0x68, 0xd5, 0xaf, 0x0e, 0xa4, 0x77, 0xb7, 0x07, 0x69, 0x67, 0x6b, 0x90, 0xbe, 0x75, 0x13, 0x90,
-	0x26, 0x9b, 0x41, 0xfa, 0x15, 0xd8, 0x32, 0x11, 0x64, 0x0f, 0x1a, 0x89, 0x60, 0xb1, 0xc0, 0xfb,
-	0x63, 0x51, 0x35, 0x21, 0x0e, 0x58, 0x3c, 0x54, 0x57, 0xc6, 0xa2, 0x72, 0x48, 0xee, 0x41, 0x07,
-	0x55, 0x27, 0xaf, 0x59, 0x8c, 0xc8, 0x6a, 0xd1, 0x5c, 0x40, 0x5c, 0x68, 0xf1, 0xf0, 0x02, 0x75,
-	0x36, 0xea, 0xd2, 0xa9, 0xf7, 0x7b, 0x70, 0x37, 0x21, 0x5e, 0x09, 0x73, 0x8d, 0x9b, 0x61, 0xee,
-	0x3e, 0xf4, 0x11, 0xb6, 0x68, 0xf4, 0x6e, 0x12, 0x5e, 0xf0, 0x2b, 0xdc, 0x6a, 0x83, 0x96, 0x85,
-	0xde, 0x5f, 0xcc, 0x94, 0x8a, 0xc8, 0xd6, 0x70, 0x1f, 0x80, 0xf9, 0x62, 0xc5, 0xe6, 0x33, 0x7e,
-	0x25, 0x34, 0x5e, 0x14, 0x24, 0x52, 0xbf, 0x64, 0x71, 0xc2, 0x2f, 0x50, 0x6f, 0x2a, 0x7d, 0x2e,
-	0x21, 0x4f, 0xa0, 0xf3, 0x2a, 0x66, 0x97, 0x12, 0xdd, 0x52, 0xbc, 0x70, 0xab, 0xfb, 0x3d, 0xd5,
-	0x06, 0x34, 0x37, 0x95, 0xfd, 0x41, 0xb6, 0xa6, 0xac, 0x84, 0x28, 0x4f, 0x56, 0x73, 0xa1, 0xbb,
-	0xcc, 0xc1, 0xc6, 0x86, 0x56, 0xb1, 0xa7, 0x75, 0x8b, 0xd4, 0x95, 0x5d, 0x63, 0xfb, 0xb2, 0x6b,
-	0xd6, 0x97, 0x9d, 0xf7, 0x2f, 0x03, 0x7a, 0xc5, 0x36, 0x49, 0x7e, 0x06, 0x5d, 0xdd, 0x28, 0xe5,
-	0xce, 0xf4, 0x61, 0x7d, 0xa0, 0x17, 0x17, 0xad, 0x25, 0xc1, 0x4b, 0xf0, 0x22, 0x5f, 0x4f, 0xf0,
-	0xd0, 0x8e, 0xfc, 0x16, 0xee, 0x68, 0xff, 0x6a, 0xce, 0xac, 0x1b, 0xe6, 0x6c, 0xc3, 0x3a, 0xde,
-	0x03, 0x5d, 0x17, 0xb2, 0xc1, 0x64, 0xc0, 0x67, 0xe4, 0xc0, 0xe7, 0xbd, 0x37, 0xa0, 0x9d, 0x9e,
-	0x25, 0x99, 0x40, 0x2f, 0x3d, 0xcd, 0x02, 0x8d, 0xf9, 0x68, 0xd3, 0xd9, 0x67, 0x03, 0x64, 0x32,
-	0x25, 0x57, 0xfc, 0x56, 0x5e, 0x5d, 0x38, 0x26, 0x9f, 0x41, 0x67, 0xc9, 0x62, 0xb6, 0xe0, 0x82,
-	0xc7, 0x3a, 0xc2, 0xf5, 0x1c, 0xa5, 0x06, 0x34, 0xb7, 0xf5, 0x3e, 0x86, 0x5e, 0xf1, 0x53, 0xd8,
-	0x31, 0xf9, 0x95, 0x70, 0x76, 0x48, 0x1f, 0x3a, 0x99, 0x87, 0x63, 0x78, 0x7f, 0x34, 0x0b, 0x73,
-	0xf2, 0x25, 0xf4, 0xb3, 0x35, 0x0a, 0xf1, 0x7c, 0xbc, 0xf1, 0x9b, 0xf9, 0x08, 0x23, 0x2a, 0x7b,
-	0x4b, 0x04, 0x79, 0xcb, 0xe6, 0x2b, 0xae, 0x63, 0x52, 0x13, 0x19, 0x68, 0x28, 0x09, 0xae, 0xa5,
-	0x02, 0x95, 0xe3, 0x9c, 0x94, 0xd8, 0x5b, 0x92, 0x12, 0xef, 0x2b, 0xe8, 0x97, 0xbe, 0x4d, 0x00,
-	0x9a, 0x12, 0x70, 0x03, 0x5f, 0x91, 0x8d, 0xd1, 0xb7, 0x21, 0x5b, 0x04, 0xbe, 0x63, 0x10, 0x02,
-	0x03, 0xf9, 0xde, 0x08, 0xd8, 0xfc, 0xeb, 0xa9, 0x88, 0x83, 0xf0, 0xd2, 0x31, 0xc9, 0x2d, 0xe8,
-	0xa7, 0x32, 0x45, 0x2a, 0xac, 0x9c, 0x5f, 0xd8, 0x9e, 0x97, 0xd5, 0xb8, 0xa2, 0x4c, 0xe9, 0xd1,
-	0x18, 0xf9, 0xd1, 0x78, 0x57, 0x00, 0xf9, 0xa6, 0xc8, 0x67, 0xd0, 0x7a, 0xcd, 0xd9, 0x05, 0x8f,
-	0x93, 0x0f, 0xc2, 0xd5, 0x4c, 0x63, 0x10, 0x4d, 0xad, 0xc9, 0x8f, 0xc1, 0x8e, 0xa3, 0x77, 0xe9,
-	0x05, 0xb8, 0xc6, 0x0b, 0x4d, 0xbd, 0x8f, 0x34, 0xe5, 0x49, 0xc5, 0x32, 0xcd, 0x3e, 0x9f, 0xcf,
-	0xd3, 0x32, 0x55, 0x13, 0xef, 0xaf, 0xa6, 0xc6, 0xd7, 0x9a, 0xea, 0x27, 0x67, 0x85, 0xf6, 0xa6,
-	0x2f, 0x90, 0xda, 0xf7, 0x7e, 0xed, 0x0e, 0xaa, 0x97, 0xa7, 0xea, 0x5c, 0xc3, 0x5b, 0xcc, 0xff,
-	0x1f, 0x6f, 0xb1, 0xfe, 0x57, 0xde, 0xe2, 0xe6, 0xec, 0xc3, 0xc6, 0x87, 0x60, 0xc6, 0x3c, 0xf6,
-	0xa1, 0xaf, 0x87, 0x94, 0xb3, 0x24, 0x0a, 0x91, 0x66, 0x75, 0x68, 0x59, 0xe8, 0xfd, 0xdb, 0x84,
-	0xbd, 0xba, 0xf8, 0xc9, 0x9d, 0x8c, 0x3a, 0x1a, 0xb8, 0x6e, 0x4a, 0x1b, 0x1f, 0x82, 0x13, 0x73,
-	0x3f, 0x7a, 0xcb, 0x63, 0x79, 0x36, 0xc8, 0x62, 0x14, 0xb9, 0xa4, 0x6b, 0x72, 0xe2, 0x41, 0x8f,
-	0xcb, 0x41, 0xda, 0x91, 0xd5, 0x75, 0x28, 0xc9, 0x90, 0x20, 0x09, 0xe6, 0xbf, 0x99, 0xc5, 0xcc,
-	0x57, 0x77, 0x43, 0x12, 0xa4, 0x4c, 0x82, 0x7a, 0x3f, 0xe6, 0x3c, 0x9c, 0xbe, 0x8e, 0x04, 0xc6,
-	0xd0, 0xa3, 0x05, 0xc9, 0x3a, 0x49, 0x6b, 0xd6, 0x91, 0x34, 0x17, 0x5a, 0x3a, 0xa9, 0x9a, 0xe1,
-	0xa5, 0x53, 0xf2, 0x0c, 0x3a, 0xb8, 0x1f, 0xc4, 0x82, 0x36, 0x62, 0xc1, 0xe1, 0x36, 0x05, 0x72,
-	0x38, 0x4e, 0xbd, 0x68, 0xbe, 0x80, 0xf7, 0x08, 0x3a, 0x99, 0x5c, 0xe2, 0xd0, 0xf1, 0x74, 0x3a,
-	0xa6, 0xb3, 0xc9, 0xf3, 0x33, 0x67, 0x87, 0x38, 0xd0, 0x7b, 0x31, 0xa6, 0x93, 0xd3, 0xc9, 0xc9,
-	0x31, 0x4a, 0x0c, 0xef, 0x4f, 0x06, 0x38, 0xd5, 0x23, 0xae, 0x24, 0xc4, 0x58, 0x4b, 0x48, 0x35,
-	0xa9, 0xe6, 0x86, 0xa4, 0xe6, 0x49, 0xb3, 0xea, 0x92, 0x56, 0x26, 0x10, 0x76, 0x1d, 0x81, 0x78,
-	0xdf, 0xd0, 0xdb, 0x9b, 0xae, 0x02, 0xc1, 0x75, 0x5d, 0x1c, 0xab, 0x5f, 0x1a, 0x6a, 0xa6, 0xee,
-	0x63, 0x77, 0x9d, 0x31, 0x66, 0xbf, 0x40, 0xf4, 0x6d, 0x2a, 0xfa, 0x7c, 0x47, 0x6f, 0x52, 0x5e,
-	0xf0, 0x76, 0xb5, 0xe0, 0xe5, 0xe6, 0x93, 0x53, 0x9c, 0x9e, 0x44, 0xab, 0x50, 0x95, 0x61, 0x83,
-	0xae, 0xc9, 0xb7, 0x2c, 0xc6, 0x21, 0x74, 0x93, 0x95, 0xef, 0xf3, 0x24, 0xa1, 0x4c, 0xa8, 0x47,
-	0xaa, 0x49, 0x8b, 0x22, 0x69, 0xc1, 0xc3, 0xb7, 0x41, 0x1c, 0x85, 0xf8, 0xf8, 0x6d, 0xab, 0xff,
-	0x46, 0x05, 0x51, 0xd6, 0xb6, 0x3b, 0x1a, 0xaf, 0x65, 0x2b, 0x1f, 0x42, 0x77, 0x19, 0x47, 0xdf,
-	0x70, 0x5f, 0xe0, 0xdf, 0x15, 0x50, 0x5e, 0x05, 0x91, 0xe4, 0xb1, 0x22, 0x58, 0xf0, 0x44, 0xb0,
-	0xc5, 0x52, 0x3f, 0x3a, 0x72, 0x01, 0x79, 0x04, 0xb7, 0x30, 0xa2, 0xa9, 0x42, 0x08, 0x15, 0x6a,
-	0x0f, 0x43, 0x5d, 0x57, 0xd4, 0x91, 0xaf, 0xfe, 0xf6, 0xe4, 0x6b, 0xb0, 0x35, 0xe7, 0xdf, 0xbd,
-	0x09, 0xe7, 0x77, 0x36, 0x73, 0xfe, 0xbf, 0x59, 0xb0, 0x5b, 0x29, 0x4b, 0x24, 0x1f, 0xa9, 0xe8,
-	0xc3, 0xbc, 0x4e, 0xfa, 0xe4, 0xb6, 0x08, 0xae, 0x9a, 0x8d, 0xab, 0x34, 0x69, 0x06, 0x5e, 0x12,
-	0x92, 0xc7, 0x70, 0x3b, 0x15, 0x14, 0xab, 0xc7, 0x42, 0xdb, 0x3a, 0xd5, 0xc6, 0x22, 0x7c, 0x0c,
-	0xb7, 0xd5, 0x68, 0xc4, 0x04, 0x4b, 0xbb, 0xa2, 0x62, 0xbb, 0x0d, 0x5a, 0xa7, 0xda, 0x1e, 0x17,
-	0xd3, 0xf6, 0xd1, 0x2a, 0xb7, 0x8f, 0x23, 0xd8, 0x4b, 0x37, 0x58, 0xaa, 0x87, 0x36, 0x6e, 0xbe,
-	0x56, 0x87, 0x3e, 0x6a, 0x5e, 0xde, 0x66, 0x07, 0xb7, 0x59, 0xab, 0x23, 0x9f, 0x40, 0x93, 0xe7,
-	0x8f, 0xe3, 0xee, 0xd1, 0xf7, 0xd6, 0x1e, 0x9f, 0x52, 0x4b, 0xb5, 0x91, 0xf7, 0x77, 0x03, 0x1a,
-	0xaa, 0xb9, 0x7c, 0x0a, 0xb6, 0xc8, 0xf9, 0xdb, 0x83, 0x5a, 0xb7, 0x02, 0x48, 0xa3, 0x71, 0xfa,
-	0xf7, 0x11, 0xc9, 0x99, 0x99, 0xff, 0x7d, 0x44, 0x82, 0x76, 0x1f, 0x60, 0x1e, 0x84, 0xfc, 0x6c,
-	0xb5, 0x78, 0xa9, 0xa9, 0x68, 0x83, 0x16, 0x24, 0xc5, 0x1e, 0xa2, 0xda, 0x54, 0x3a, 0xf5, 0x8e,
-	0x8a, 0xa8, 0xbf, 0x0b, 0xdd, 0xf3, 0x63, 0x3a, 0x1d, 0x7f, 0x3d, 0xa6, 0xf4, 0x39, 0x75, 0x76,
-	0xc8, 0x1e, 0x38, 0x2f, 0x8e, 0x9f, 0x4d, 0x46, 0x88, 0xfa, 0x5a, 0x6a, 0x78, 0x7f, 0x30, 0x60,
-	0x90, 0x71, 0x97, 0x17, 0xc8, 0x1a, 0xf1, 0x95, 0xa9, 0x27, 0x1a, 0xf8, 0x73, 0x01, 0x79, 0x02,
-	0x77, 0x32, 0xea, 0x19, 0xfc, 0x8e, 0x5f, 0x64, 0x7e, 0x3a, 0x90, 0x0d, 0x5a, 0xfd, 0xb0, 0x53,
-	0x1a, 0xf5, 0x72, 0x53, 0x0f, 0x3b, 0x2d, 0x79, 0xf8, 0x05, 0xec, 0x56, 0xde, 0xf7, 0x32, 0x84,
-	0xb3, 0xe7, 0xb3, 0xf1, 0x6f, 0xc6, 0x27, 0xbf, 0x9e, 0x8d, 0x47, 0xce, 0x8e, 0x24, 0x9e, 0xe7,
-	0xb2, 0x95, 0x8d, 0x1c, 0x43, 0x8e, 0x4f, 0x8f, 0x27, 0xcf, 0xc6, 0x23, 0xc7, 0x94, 0x24, 0x74,
-	0xfa, 0xab, 0xc9, 0xf9, 0xf9, 0x78, 0xe4, 0x58, 0x9f, 0xdf, 0xfa, 0xb3, 0x39, 0xf8, 0x02, 0x0f,
-	0x21, 0xbd, 0xcd, 0x2f, 0x9b, 0x78, 0x63, 0x3e, 0xfd, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x65,
-	0x8e, 0x6d, 0x85, 0x32, 0x17, 0x00, 0x00,
+var fileDescriptor_423806180556987f = []byte{
+	// 2099 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x4f, 0x6f, 0x23, 0x49,
+	0x15, 0x9f, 0x76, 0xdb, 0xb1, 0xfd, 0xfc, 0x27, 0x9d, 0x4a, 0x76, 0x68, 0x46, 0xc3, 0x8c, 0xd5,
+	0xca, 0x6a, 0xcd, 0x68, 0x36, 0x0c, 0x59, 0x98, 0x15, 0x42, 0x02, 0x65, 0x63, 0x67, 0xc7, 0x30,
+	0x9b, 0x89, 0xca, 0x66, 0x84, 0xf6, 0xb2, 0xf4, 0x74, 0x2a, 0x49, 0x6f, 0xec, 0x6e, 0xab, 0xbb,
+	0x3c, 0x93, 0xdd, 0x0f, 0xc0, 0x91, 0xc3, 0x5e, 0xf8, 0x08, 0x48, 0x5c, 0xf9, 0x02, 0x9c, 0xb8,
+	0x20, 0xed, 0x47, 0x40, 0xe2, 0xc0, 0x85, 0x0f, 0x81, 0x50, 0xbd, 0xaa, 0xea, 0x7f, 0x6e, 0x27,
+	0x36, 0xe2, 0xb0, 0xb7, 0xaa, 0xf7, 0xa7, 0xfe, 0xbc, 0x7a, 0x7f, 0x7e, 0xaf, 0x00, 0xe2, 0x39,
+	0xf3, 0x0e, 0xe6, 0x51, 0xc8, 0x43, 0xd2, 0xbd, 0x74, 0x17, 0x97, 0xec, 0x60, 0xc6, 0xe2, 0xd8,
+	0xbd, 0x64, 0xb1, 0xf3, 0x9f, 0x2a, 0x34, 0xcf, 0x04, 0x67, 0x3c, 0x67, 0x1e, 0xe9, 0x41, 0x4b,
+	0xc8, 0xbe, 0x60, 0xee, 0xb9, 0x1f, 0x5c, 0xda, 0x46, 0xcf, 0xe8, 0x37, 0x69, 0x96, 0x44, 0x7e,
+	0x04, 0x35, 0x9f, 0xb3, 0x59, 0x6c, 0x57, 0x7a, 0x66, 0xbf, 0x75, 0xf8, 0xfd, 0x83, 0xfc, 0x7a,
+	0x07, 0xb8, 0xd6, 0x88, 0xb3, 0x19, 0x95, 0x72, 0x64, 0x1f, 0x3a, 0x7e, 0x3c, 0x71, 0xdf, 0x4c,
+	0xd9, 0x20, 0xf2, 0xdf, 0xb2, 0xc0, 0x36, 0x7b, 0x46, 0xbf, 0x41, 0xf3, 0x44, 0xf2, 0x2b, 0xd8,
+	0x9e, 0x47, 0xec, 0x45, 0x18, 0x5e, 0x9f, 0xb8, 0xfe, 0x74, 0x11, 0xb1, 0xd8, 0xae, 0xe2, 0x06,
+	0xbd, 0xd2, 0x0d, 0x32, 0x82, 0xb4, 0xa8, 0x48, 0x5e, 0x82, 0x35, 0x0f, 0x63, 0x9e, 0x5b, 0xac,
+	0xb6, 0xe6, 0x62, 0x4b, 0x9a, 0xe4, 0x01, 0x34, 0x2e, 0xfc, 0x29, 0x3b, 0x75, 0x67, 0xcc, 0xde,
+	0x42, 0x7b, 0x24, 0x73, 0x42, 0xa0, 0xca, 0xdd, 0xcb, 0xd8, 0xae, 0xf7, 0xcc, 0x7e, 0x93, 0xe2,
+	0x98, 0xf4, 0x93, 0x9b, 0x7c, 0xa6, 0x76, 0xb1, 0x1b, 0xc8, 0x2e, 0x92, 0xc9, 0x93, 0xf4, 0x9c,
+	0x89, 0x68, 0x13, 0x45, 0x97, 0xe8, 0xe4, 0x09, 0x74, 0xf3, 0xea, 0x36, 0x08, 0xc9, 0x4f, 0x2a,
+	0xb6, 0x41, 0x0b, 0x1c, 0xf2, 0x14, 0xb6, 0x0b, 0xfa, 0x76, 0x2b, 0x11, 0x2e, 0xb2, 0xc8, 0x01,
+	0x10, 0xa5, 0x3f, 0xf6, 0x22, 0xc6, 0x82, 0xf8, 0x2a, 0xe4, 0xb1, 0xdd, 0xee, 0x99, 0xfd, 0x36,
+	0x2d, 0xe1, 0x90, 0x67, 0xb0, 0xab, 0x97, 0xc8, 0x2a, 0x74, 0x50, 0xa1, 0x8c, 0x45, 0x1e, 0x42,
+	0x53, 0xb8, 0xc2, 0x71, 0xb8, 0x08, 0xb8, 0xdd, 0xed, 0x19, 0x7d, 0x93, 0xa6, 0x04, 0xe7, 0xdf,
+	0xda, 0x01, 0x85, 0xd3, 0x90, 0x5f, 0x40, 0x43, 0xb0, 0x26, 0x5f, 0xcd, 0x19, 0x7a, 0x5f, 0xf7,
+	0xd0, 0x59, 0xe9, 0x61, 0x07, 0x23, 0x25, 0x49, 0x13, 0x1d, 0xf2, 0x21, 0x54, 0x63, 0xce, 0xe6,
+	0x76, 0xa5, 0x67, 0xac, 0xf4, 0xce, 0x31, 0x67, 0x73, 0x8a, 0x62, 0xe4, 0x39, 0xd4, 0xbd, 0x30,
+	0xf0, 0xd8, 0x9c, 0xa3, 0x5b, 0xb6, 0x0e, 0x1f, 0x96, 0x6a, 0x1c, 0x4b, 0x19, 0xaa, 0x85, 0xc9,
+	0xcf, 0xa0, 0x11, 0x7b, 0x2c, 0x70, 0x23, 0x3f, 0xb4, 0xab, 0xa8, 0xf8, 0x83, 0xf2, 0xad, 0x94,
+	0x10, 0x4d, 0xc4, 0xc9, 0xe7, 0xb0, 0xcb, 0x53, 0xc7, 0xd7, 0x02, 0x76, 0x0d, 0x57, 0xe9, 0x97,
+	0xae, 0x32, 0x59, 0x96, 0xa7, 0x65, 0x8b, 0xc8, 0xeb, 0xcc, 0x66, 0x2c, 0xe0, 0xe8, 0xaa, 0xab,
+	0xaf, 0x83, 0x32, 0x54, 0x0b, 0x93, 0x67, 0x50, 0xc3, 0xe5, 0xec, 0x3a, 0x6a, 0x3d, 0x58, 0x7d,
+	0x0a, 0x2a, 0x05, 0x85, 0x9d, 0xd1, 0xf3, 0x1b, 0xb7, 0xd8, 0x79, 0xe2, 0x5e, 0xc6, 0x2a, 0x28,
+	0xb2, 0x41, 0xd4, 0xcc, 0x07, 0x91, 0xf3, 0x25, 0x34, 0xf4, 0x43, 0x92, 0x06, 0x54, 0xc5, 0xeb,
+	0x58, 0xf7, 0x48, 0x0b, 0xea, 0xea, 0x98, 0x96, 0x21, 0x27, 0x68, 0x79, 0xab, 0x42, 0xda, 0xd0,
+	0xd0, 0x17, 0xb6, 0x4c, 0xf2, 0x3d, 0xd8, 0x2d, 0x31, 0x8f, 0x55, 0x25, 0x4d, 0xa8, 0x21, 0xc3,
+	0xaa, 0x89, 0x55, 0xc5, 0x59, 0xac, 0x2d, 0xe7, 0x2f, 0x75, 0xe8, 0xe4, 0x1e, 0x46, 0x84, 0xab,
+	0x7e, 0x9a, 0x7c, 0xd6, 0x2b, 0x92, 0xc9, 0x03, 0xd8, 0xba, 0x70, 0xfd, 0x29, 0x3b, 0x47, 0xe7,
+	0x6a, 0x60, 0x34, 0x29, 0x0a, 0xf9, 0x29, 0x34, 0xbc, 0x30, 0xe0, 0xec, 0x86, 0xc7, 0xb6, 0x79,
+	0x57, 0x62, 0x4c, 0x44, 0xc9, 0x2f, 0xa1, 0xa3, 0x77, 0x19, 0x61, 0x52, 0xad, 0xde, 0xa5, 0x9b,
+	0x97, 0x27, 0x2f, 0x92, 0xb4, 0xa0, 0xf2, 0x95, 0xf2, 0xa3, 0xbb, 0x13, 0x5d, 0x41, 0x0f, 0x13,
+	0x70, 0x3e, 0xf5, 0x29, 0x17, 0x5a, 0x27, 0x01, 0xe7, 0x15, 0x4b, 0xd3, 0xe2, 0x3e, 0x74, 0xd8,
+	0x0d, 0xf3, 0x16, 0xdc, 0x0f, 0x83, 0x89, 0x3f, 0x63, 0xe8, 0x39, 0x26, 0xcd, 0x13, 0xc9, 0x43,
+	0xa8, 0xc7, 0xd7, 0xfe, 0x7c, 0xce, 0xce, 0xd1, 0x4d, 0xa4, 0x91, 0x35, 0x89, 0x3c, 0x02, 0x10,
+	0xc3, 0x61, 0x14, 0x85, 0x51, 0x2c, 0x13, 0x20, 0xcd, 0x50, 0x48, 0x17, 0x2a, 0xa3, 0x81, 0xdd,
+	0xc2, 0xe7, 0xab, 0x8c, 0x06, 0xc2, 0xbc, 0x9c, 0xb9, 0xd1, 0x20, 0x7c, 0x17, 0x08, 0xaf, 0x92,
+	0x59, 0xed, 0x76, 0xf3, 0xe6, 0xe4, 0x49, 0x1f, 0xaa, 0xf1, 0xdc, 0x0d, 0xec, 0x0e, 0x5a, 0x62,
+	0xaf, 0xa8, 0x37, 0x9e, 0xbb, 0x01, 0x45, 0x09, 0x32, 0x82, 0xed, 0xe4, 0x26, 0x63, 0xee, 0xf2,
+	0x45, 0x8c, 0x99, 0xae, 0x7b, 0xf8, 0xb8, 0xa8, 0x34, 0xcc, 0x8b, 0xd1, 0xa2, 0x5e, 0x59, 0x01,
+	0xd9, 0x5e, 0xbf, 0x80, 0x58, 0x6b, 0x17, 0x90, 0x9d, 0x4d, 0x0a, 0x08, 0xd9, 0xb4, 0x80, 0xec,
+	0x6e, 0x5a, 0x40, 0xf6, 0x56, 0x16, 0x10, 0xe7, 0x02, 0xaa, 0xc2, 0xd4, 0x64, 0x0f, 0x6a, 0x31,
+	0x77, 0x23, 0x8e, 0x11, 0x6a, 0x52, 0x39, 0x21, 0x16, 0x98, 0x2c, 0x90, 0x41, 0x69, 0x52, 0x31,
+	0x14, 0x05, 0x07, 0x59, 0xc7, 0x57, 0x6e, 0x84, 0x79, 0xdd, 0xa4, 0x29, 0x81, 0xd8, 0x50, 0x67,
+	0xc1, 0x39, 0xf2, 0xaa, 0xc8, 0xd3, 0x53, 0xe7, 0x4f, 0x26, 0xd8, 0xab, 0x12, 0x6e, 0x2e, 0xe5,
+	0x1b, 0x9b, 0xa5, 0xfc, 0x7d, 0xe8, 0x60, 0xd6, 0xa4, 0xe1, 0xbb, 0x51, 0x70, 0xce, 0x6e, 0xf0,
+	0xac, 0x35, 0x9a, 0x27, 0x92, 0x9f, 0xc0, 0x7b, 0x5a, 0x63, 0x92, 0x93, 0x36, 0x51, 0xba, 0x9c,
+	0x49, 0x9e, 0xc2, 0x8e, 0x1f, 0x0b, 0xec, 0x96, 0x85, 0x58, 0x55, 0x84, 0x58, 0xcb, 0x0c, 0xb1,
+	0x87, 0x1f, 0x8f, 0xb3, 0x0b, 0x29, 0x8d, 0x1a, 0x6a, 0x94, 0x33, 0xc9, 0x0b, 0xd8, 0xd1, 0x9b,
+	0x0f, 0x5c, 0xee, 0x22, 0x4b, 0x65, 0x87, 0xdb, 0x4a, 0xc5, 0xb2, 0x12, 0x39, 0x01, 0xab, 0x78,
+	0x8d, 0x35, 0x6a, 0xce, 0x92, 0x8e, 0xf3, 0x47, 0x53, 0xa3, 0x56, 0x51, 0xc5, 0x1f, 0x01, 0xb8,
+	0x1e, 0x5f, 0xb8, 0xd3, 0x09, 0xbb, 0xe1, 0x2a, 0x7d, 0x67, 0x28, 0x82, 0x3f, 0x77, 0xa3, 0x98,
+	0x9d, 0x23, 0xbf, 0x22, 0xf9, 0x29, 0x85, 0x3c, 0x87, 0xe6, 0x45, 0xe4, 0x5e, 0x8a, 0x62, 0xa3,
+	0xd3, 0xb7, 0x5d, 0x3c, 0xce, 0x89, 0x12, 0xa0, 0xa9, 0xa8, 0x28, 0xe5, 0x02, 0x45, 0x24, 0x11,
+	0x4d, 0x59, 0xbc, 0x98, 0x72, 0x05, 0x08, 0xfa, 0x2b, 0xb1, 0x47, 0x41, 0x9e, 0x96, 0x2d, 0x52,
+	0x96, 0x05, 0x6a, 0xeb, 0x67, 0x81, 0xad, 0x15, 0x59, 0xa0, 0x3c, 0x56, 0xeb, 0x9b, 0xc6, 0x6a,
+	0x63, 0x75, 0xac, 0xfe, 0xc3, 0x80, 0x76, 0x16, 0x33, 0x91, 0x9f, 0x43, 0x4b, 0xa1, 0x26, 0x71,
+	0x77, 0x15, 0x3a, 0xb7, 0x00, 0xb3, 0xac, 0xb4, 0xe8, 0x36, 0x62, 0xcc, 0xdc, 0x77, 0x77, 0x1b,
+	0x28, 0x47, 0x7e, 0x07, 0xf7, 0x95, 0x7e, 0xf1, 0x55, 0xcc, 0x0d, 0x5f, 0x65, 0xc5, 0x3a, 0xce,
+	0x63, 0xe5, 0x79, 0x02, 0x51, 0x24, 0x95, 0xce, 0x48, 0x2b, 0x9d, 0xf3, 0x77, 0x03, 0x1a, 0xda,
+	0x5b, 0xc8, 0x08, 0xda, 0xda, 0x5f, 0x32, 0x98, 0xf6, 0xfd, 0x55, 0xde, 0x95, 0x0c, 0x10, 0xd6,
+	0xe6, 0x54, 0x71, 0xaf, 0xd4, 0x7f, 0x71, 0x4c, 0x3e, 0x86, 0xe6, 0xdc, 0x8d, 0xdc, 0x19, 0xe3,
+	0x2c, 0x52, 0x37, 0x5c, 0xb6, 0x91, 0x16, 0xa0, 0xa9, 0xac, 0xf3, 0x01, 0xb4, 0xb3, 0x5b, 0x21,
+	0x44, 0x62, 0x37, 0xdc, 0xba, 0x47, 0x3a, 0xd0, 0x4c, 0x34, 0x2c, 0xc3, 0xf9, 0xa6, 0x92, 0x99,
+	0x93, 0xcf, 0xa0, 0x93, 0xac, 0x91, 0xb9, 0xcf, 0x07, 0x2b, 0xf7, 0x4c, 0x47, 0x78, 0xa3, 0xbc,
+	0xb6, 0x48, 0xe8, 0x6f, 0xdd, 0xe9, 0x82, 0xa9, 0x3b, 0xc9, 0x89, 0xb8, 0x68, 0x20, 0x80, 0xa2,
+	0x29, 0x2f, 0x2a, 0xc6, 0x29, 0x42, 0xad, 0xae, 0x89, 0x50, 0x9d, 0xcf, 0xa1, 0x93, 0xdb, 0x9b,
+	0x00, 0x6c, 0x89, 0x0a, 0xeb, 0x7b, 0x12, 0x5d, 0x0e, 0xbe, 0x0a, 0xdc, 0x99, 0xef, 0x59, 0x06,
+	0x21, 0xd0, 0x15, 0x79, 0xd2, 0x77, 0xa7, 0x5f, 0x8c, 0x79, 0xe4, 0x07, 0x97, 0x56, 0x85, 0xec,
+	0x40, 0x47, 0xd3, 0x24, 0x8a, 0x34, 0x53, 0x40, 0x59, 0x75, 0x9c, 0xc4, 0xc7, 0x25, 0x7e, 0xd6,
+	0x4f, 0x63, 0xa4, 0x4f, 0xe3, 0xdc, 0x00, 0xa4, 0x87, 0x22, 0x1f, 0x43, 0xfd, 0x8a, 0xb9, 0xe7,
+	0x2c, 0x8a, 0x6f, 0x2d, 0x1e, 0x3a, 0xc1, 0x51, 0x2d, 0x4d, 0x7e, 0x0c, 0xd5, 0x28, 0x7c, 0xa7,
+	0x03, 0xe0, 0x0e, 0x2d, 0x14, 0x75, 0xde, 0x57, 0x18, 0x57, 0x93, 0x85, 0x99, 0x3d, 0x36, 0x9d,
+	0x6a, 0x37, 0x95, 0x13, 0xe7, 0xaf, 0x15, 0x55, 0xed, 0x4a, 0xbc, 0x9f, 0x9c, 0x66, 0xf0, 0x8c,
+	0x0a, 0x20, 0x79, 0xee, 0xfd, 0xd2, 0x13, 0x14, 0x83, 0xa7, 0xa8, 0x5c, 0x02, 0x54, 0x2b, 0xff,
+	0x3f, 0xa0, 0x6a, 0xfe, 0xaf, 0x40, 0xd5, 0x4e, 0xe1, 0xa6, 0x2c, 0x99, 0x09, 0xd4, 0xdc, 0x87,
+	0x8e, 0x1a, 0x52, 0xe6, 0xc6, 0xa1, 0x2c, 0x90, 0x4d, 0x9a, 0x27, 0x3a, 0xdf, 0x9a, 0xb0, 0x57,
+	0x76, 0x7f, 0x72, 0x3f, 0xe9, 0x15, 0x0c, 0x5c, 0x57, 0xf7, 0x09, 0x4f, 0xc0, 0x8a, 0x98, 0x17,
+	0xbe, 0x65, 0x91, 0x78, 0x1b, 0x84, 0xad, 0xb2, 0x9b, 0xa0, 0x4b, 0x74, 0xe2, 0x40, 0x9b, 0x89,
+	0x81, 0x86, 0x60, 0x32, 0x1c, 0x72, 0x34, 0x44, 0xc4, 0xdc, 0xf5, 0xae, 0x27, 0x91, 0xeb, 0xc9,
+	0xd8, 0x10, 0x88, 0x38, 0xa1, 0x10, 0x07, 0x20, 0xc6, 0xe4, 0x3c, 0xbe, 0x0a, 0x39, 0xde, 0xa1,
+	0x8d, 0x20, 0x2e, 0x43, 0x5d, 0x46, 0xe6, 0x5b, 0x65, 0xc8, 0xdc, 0x86, 0xba, 0x32, 0xac, 0x82,
+	0xf5, 0x7a, 0x4a, 0x5e, 0x42, 0x13, 0xcf, 0x84, 0xf9, 0xa0, 0x81, 0xf9, 0xe0, 0x60, 0x1d, 0x27,
+	0x39, 0x18, 0x6a, 0x2d, 0x9a, 0x2e, 0x20, 0xf0, 0xcc, 0x85, 0x7c, 0x9d, 0xb4, 0xaa, 0x60, 0x2f,
+	0xd0, 0xa6, 0xcb, 0x0c, 0xfc, 0xaf, 0xca, 0xd4, 0x25, 0xc0, 0xba, 0x94, 0x25, 0x39, 0x4f, 0xa1,
+	0x99, 0xec, 0x23, 0x72, 0xdb, 0xd1, 0x78, 0x3c, 0xa4, 0x93, 0xd1, 0xab, 0x53, 0xeb, 0x1e, 0xb1,
+	0xa0, 0xfd, 0x7a, 0x48, 0x47, 0x27, 0xa3, 0xe3, 0x23, 0xa4, 0x18, 0xce, 0xb7, 0x06, 0x58, 0x45,
+	0xb7, 0x29, 0x18, 0xd9, 0x28, 0x31, 0x72, 0xfe, 0xa1, 0x2a, 0x25, 0x0f, 0x95, 0x7f, 0x08, 0x73,
+	0xd5, 0x43, 0xe4, 0x61, 0x62, 0xb5, 0x0c, 0x26, 0x96, 0x1a, 0xa8, 0xb6, 0xc2, 0x40, 0xce, 0xbf,
+	0xb6, 0xd4, 0x85, 0xc6, 0x0b, 0x9f, 0x33, 0xe5, 0x9d, 0x47, 0xf2, 0x97, 0x4f, 0xce, 0x64, 0x56,
+	0x68, 0x2d, 0x37, 0x2a, 0xc9, 0xaf, 0xa0, 0x8a, 0xe9, 0xac, 0xce, 0x77, 0x34, 0x9e, 0xd3, 0xb0,
+	0xab, 0x16, 0xc3, 0x4e, 0x1c, 0x3e, 0x3e, 0xc1, 0xa9, 0xfc, 0x88, 0xaa, 0xa1, 0x71, 0x97, 0xe8,
+	0x6b, 0x86, 0x83, 0x70, 0xbc, 0x85, 0xe7, 0xb1, 0x38, 0xa6, 0x2e, 0x97, 0xff, 0x26, 0x15, 0x9a,
+	0x25, 0x09, 0x09, 0x16, 0xbc, 0xf5, 0xa3, 0x30, 0xc0, 0xff, 0x98, 0x86, 0xfc, 0x4a, 0xcd, 0x90,
+	0x12, 0xf0, 0xd0, 0x54, 0x55, 0x43, 0x00, 0x8a, 0x1e, 0xb4, 0xe6, 0x51, 0xf8, 0x25, 0xf3, 0x38,
+	0xfe, 0x95, 0x80, 0xd4, 0xca, 0x90, 0x44, 0x73, 0xc3, 0xfd, 0x19, 0x8b, 0xb9, 0x3b, 0x9b, 0xab,
+	0x5e, 0x37, 0x25, 0x08, 0xef, 0xc0, 0x1b, 0x8d, 0x65, 0x9e, 0x92, 0x57, 0x6d, 0xe3, 0x55, 0x97,
+	0x19, 0x65, 0x20, 0xb3, 0xb3, 0x3e, 0xc8, 0xec, 0xae, 0xdd, 0x6a, 0x6e, 0x6f, 0xd2, 0x6a, 0x5a,
+	0x9b, 0xb6, 0x9a, 0x3b, 0x9b, 0xc2, 0x57, 0xb2, 0xfa, 0xaf, 0xd2, 0x86, 0xba, 0x77, 0xb5, 0x08,
+	0xae, 0xd9, 0xb9, 0xbd, 0x2b, 0x2b, 0x82, 0x9a, 0x0a, 0xbb, 0xe3, 0x70, 0xec, 0x7f, 0xcd, 0xec,
+	0x3d, 0xd9, 0x54, 0x26, 0x04, 0xe7, 0x9f, 0x26, 0x6c, 0x17, 0x02, 0x06, 0xc1, 0x99, 0x26, 0xdd,
+	0x8e, 0x7b, 0x85, 0x4e, 0x2a, 0x8b, 0xc5, 0x47, 0x75, 0x3c, 0xf2, 0x01, 0x55, 0xbf, 0x98, 0x23,
+	0x8a, 0xcb, 0x69, 0x42, 0xd6, 0xaf, 0x65, 0xb7, 0x58, 0xc6, 0x5a, 0x19, 0x1e, 0xcf, 0x60, 0x57,
+	0x8e, 0x92, 0x46, 0x8d, 0x0a, 0xc8, 0x21, 0xfa, 0x8d, 0x1a, 0x2d, 0x63, 0xad, 0x5f, 0x33, 0x74,
+	0x79, 0xad, 0xe7, 0xcb, 0xeb, 0x21, 0xec, 0xe9, 0x03, 0xe6, 0x3c, 0xb5, 0x81, 0x87, 0x2f, 0xe5,
+	0xa1, 0x8e, 0x9c, 0xe7, 0x8f, 0xd9, 0xc4, 0x63, 0x96, 0xf2, 0xc8, 0x87, 0xb0, 0xc5, 0xd2, 0xdf,
+	0xa2, 0xd6, 0xe1, 0x7b, 0x4b, 0xbf, 0x31, 0x82, 0x4b, 0x95, 0xd0, 0xed, 0xb1, 0xe5, 0x7c, 0x63,
+	0xc0, 0x6e, 0xbe, 0xc5, 0xcf, 0xbf, 0xb3, 0xe8, 0x43, 0x6e, 0x7d, 0x67, 0x6c, 0x54, 0x52, 0xd9,
+	0x65, 0x2b, 0x56, 0xca, 0xff, 0xc4, 0x32, 0x87, 0x32, 0x8b, 0x87, 0xfa, 0x83, 0xa1, 0x1d, 0x4f,
+	0x34, 0x4f, 0xdf, 0x81, 0x03, 0xfd, 0xcd, 0x80, 0x9a, 0x04, 0x30, 0x1f, 0x41, 0x95, 0xa7, 0x3d,
+	0xc2, 0xe3, 0x52, 0xd3, 0x67, 0x40, 0x00, 0x0a, 0xeb, 0x9f, 0x62, 0x6c, 0x00, 0x2a, 0xe9, 0x4f,
+	0x31, 0x36, 0x01, 0x8f, 0x00, 0xa6, 0x7e, 0xc0, 0x4e, 0x17, 0xb3, 0x37, 0xaa, 0xdd, 0xa9, 0xd1,
+	0x0c, 0x25, 0x8b, 0x51, 0x24, 0x14, 0xd2, 0x53, 0xe7, 0x30, 0x8b, 0x02, 0xb6, 0xa1, 0x75, 0x76,
+	0x44, 0xc7, 0xc3, 0x2f, 0x86, 0x94, 0xbe, 0xa2, 0xd6, 0x3d, 0xb2, 0x07, 0xd6, 0xeb, 0xa3, 0x97,
+	0xa3, 0x01, 0xa2, 0x00, 0x45, 0x35, 0x9c, 0xdf, 0x1b, 0xd0, 0x4d, 0x2c, 0xfb, 0x1a, 0x3b, 0x13,
+	0xfc, 0x58, 0x52, 0x13, 0x05, 0x04, 0x52, 0x02, 0x79, 0x0e, 0xf7, 0x93, 0xf6, 0xc6, 0xff, 0x9a,
+	0x9d, 0x27, 0x7a, 0xea, 0x22, 0x2b, 0xb8, 0xea, 0x7b, 0x42, 0x72, 0xe4, 0xff, 0x83, 0xfc, 0x9e,
+	0x50, 0x94, 0x27, 0x9f, 0xc2, 0x76, 0xe1, 0xd3, 0x50, 0x5c, 0xe1, 0xf4, 0xd5, 0x64, 0xf8, 0xdb,
+	0xe1, 0xf1, 0x6f, 0x26, 0xc3, 0x81, 0x75, 0x4f, 0x34, 0x37, 0x67, 0x02, 0xda, 0x0c, 0x2c, 0x43,
+	0x8c, 0x4f, 0x8e, 0x46, 0x2f, 0x87, 0x03, 0xab, 0x22, 0x1a, 0x9d, 0xf1, 0xaf, 0x47, 0x67, 0x67,
+	0xc3, 0x81, 0x65, 0x7e, 0xf2, 0x43, 0xd1, 0x1c, 0xcf, 0x0e, 0xf8, 0x55, 0xb8, 0xb8, 0xbc, 0xe2,
+	0xef, 0xc2, 0xe8, 0x3a, 0x96, 0x8f, 0xf2, 0xe7, 0x4a, 0xf7, 0x53, 0x7c, 0x1c, 0x9d, 0xc3, 0xdf,
+	0x6c, 0xa1, 0x53, 0x7c, 0xf4, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe5, 0xb4, 0xf3, 0xa6, 0x3b,
+	0x1c, 0x00, 0x00,
 }

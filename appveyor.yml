@@ -1,41 +1,38 @@
 version: 1.0.{build}
 clone_folder: c:\gopath\src\github.com\getgauge\gauge
-init:
-- ps: >-
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-        if (!(Test-Path -Path "C:\maven" )) {
-        (new-object System.Net.WebClient).DownloadFile('http://www.us.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip', 'C:\maven-bin.zip')
-        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
-        }
+
 environment:
   GOPATH: c:\gopath
+  GAUGE_PREFIX: c:\gauge
   GAUGE_TELEMETRY_ENABLED: false
+
+before_build:
+- ps: $env:Path = $env:GAUGE_PREFIX + "\bin;" + [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
 build_script:
 - ps: >-
-    $env:Path = "$env:GOPATH\bin;" + [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    go run build\make.go
 
+    if ($LastExitCode -ne 0) { throw "Gauge Build failed" }
 
-    go get github.com/tools/godep
+    go run build\make.go --test
 
+    if ($LastExitCode -ne 0) { throw "Gauge Test failed" }
+    
 
-    godep restore
+after_build:
+- ps: go run build\make.go --install --prefix=$env:GAUGE_PREFIX
 
-    go test ./...
-
-
-    go get github.com/getgauge/gauge
 test_script:
 - ps: >-
     git clone --depth=1 https://github.com/getgauge/gauge-tests ../gauge-tests
 
     cd ../gauge-tests
 
+    gauge config gauge_repository_url https://raw.githubusercontent.com/getgauge/gauge-nightly-repository/master/
 
     gauge install
 
+    gauge -v
 
-    mvn -q clean install -Denv=ci-java -DinParallel=false
-
-
-    $wc = New-Object 'System.Net.WebClient'
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports-java\xml-report\result.xml))
+- gradlew.bat -q clean javaFT

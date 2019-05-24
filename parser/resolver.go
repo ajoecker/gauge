@@ -22,7 +22,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/getgauge/common"
 	"github.com/getgauge/gauge/gauge"
 	"github.com/getgauge/gauge/gauge_messages"
 	"github.com/getgauge/gauge/util"
@@ -37,15 +36,28 @@ type specialTypeResolver struct {
 	predefinedResolvers map[string]resolverFn
 }
 
-type ParamResolver struct {
-}
-
 func (invalidSpecialParamError invalidSpecialParamError) Error() string {
 	return invalidSpecialParamError.message
 }
 
-// GetResolvedParams based on the arg type(static, dynamic, table, special_string, special_table) resolves the parameter of a step.
-func (paramResolver *ParamResolver) GetResolvedParams(step *gauge.Step, parent *gauge.Step, lookup *gauge.ArgLookup) ([]*gauge_messages.Parameter, error) {
+//Resolve takes a step, a lookup and updates the target after reconciling the dynamic paramters from the given lookup
+func Resolve(step *gauge.Step, parent *gauge.Step, lookup *gauge.ArgLookup, target *gauge_messages.ProtoStep) error {
+	stepParameters, err := getResolvedParams(step, parent, lookup)
+	if err != nil {
+		return err
+	}
+	paramIndex := 0
+	for fragmentIndex, fragment := range target.Fragments {
+		if fragment.GetFragmentType() == gauge_messages.Fragment_Parameter {
+			target.Fragments[fragmentIndex].Parameter = stepParameters[paramIndex]
+			paramIndex++
+		}
+	}
+	return nil
+}
+
+// getResolvedParams based on the arg type(static, dynamic, table, special_string, special_table) resolves the parameter of a step.
+func getResolvedParams(step *gauge.Step, parent *gauge.Step, lookup *gauge.ArgLookup) ([]*gauge_messages.Parameter, error) {
 	parameters := make([]*gauge_messages.Parameter, 0)
 	for _, arg := range step.Args {
 		parameter := new(gauge_messages.Parameter)
@@ -68,7 +80,7 @@ func (paramResolver *ParamResolver) GetResolvedParams(step *gauge.Step, parent *
 			parameter.Name = resolvedArg.Name
 			if resolvedArg.Table.IsInitialized() {
 				parameter.ParameterType = gauge_messages.Parameter_Special_Table
-				table, err := paramResolver.createProtoStepTable(&resolvedArg.Table, lookup)
+				table, err := createProtoStepTable(&resolvedArg.Table, lookup)
 				if err != nil {
 					return nil, err
 				}
@@ -82,14 +94,14 @@ func (paramResolver *ParamResolver) GetResolvedParams(step *gauge.Step, parent *
 			parameter.Value = arg.Value
 		} else if arg.ArgType == gauge.SpecialTable {
 			parameter.ParameterType = gauge_messages.Parameter_Special_Table
-			table, err := paramResolver.createProtoStepTable(&arg.Table, lookup)
+			table, err := createProtoStepTable(&arg.Table, lookup)
 			if err != nil {
 				return nil, err
 			}
 			parameter.Table = table
 		} else {
 			parameter.ParameterType = gauge_messages.Parameter_Table
-			table, err := paramResolver.createProtoStepTable(&arg.Table, lookup)
+			table, err := createProtoStepTable(&arg.Table, lookup)
 			if err != nil {
 				return nil, err
 			}
@@ -101,7 +113,7 @@ func (paramResolver *ParamResolver) GetResolvedParams(step *gauge.Step, parent *
 	return parameters, nil
 }
 
-func (resolver *ParamResolver) createProtoStepTable(table *gauge.Table, lookup *gauge.ArgLookup) (*gauge_messages.ProtoTable, error) {
+func createProtoStepTable(table *gauge.Table, lookup *gauge.ArgLookup) (*gauge_messages.ProtoTable, error) {
 	protoTable := new(gauge_messages.ProtoTable)
 	protoTable.Headers = &gauge_messages.ProtoTableRow{Cells: table.Headers}
 	tableRows := make([]*gauge_messages.ProtoTableRow, 0)
@@ -121,6 +133,9 @@ func (resolver *ParamResolver) createProtoStepTable(table *gauge.Table, lookup *
 					return nil, err
 				}
 				value = arg.Value
+			} else if tableCells[i].CellType == gauge.SpecialString {
+				resolvedArg, _ := newSpecialTypeResolver().resolve(value)
+				value = resolvedArg.Value
 			}
 			row = append(row, value)
 		}
@@ -139,14 +154,14 @@ func newSpecialTypeResolver() *specialTypeResolver {
 func initializePredefinedResolvers() map[string]resolverFn {
 	return map[string]resolverFn{
 		"file": func(filePath string) (*gauge.StepArg, error) {
-			fileContent, err := common.ReadFileContents(util.GetPathToFile(filePath))
+			fileContent, err := util.GetFileContents(filePath)
 			if err != nil {
 				return nil, err
 			}
 			return &gauge.StepArg{Value: fileContent, ArgType: gauge.SpecialString}, nil
 		},
 		"table": func(filePath string) (*gauge.StepArg, error) {
-			csv, err := common.ReadFileContents(util.GetPathToFile(filePath))
+			csv, err := util.GetFileContents(filePath)
 			if err != nil {
 				return nil, err
 			}
@@ -182,7 +197,7 @@ func (resolver *specialTypeResolver) getStepArg(specialType string, value string
 	return nil, invalidSpecialParamError{message: fmt.Sprintf("Resolver not found for special param <%s>", arg)}
 }
 
-// Creating a copy of the lookup and populating table values
+// PopulateConceptDynamicParams creates a copy of the lookup and populates table values
 func PopulateConceptDynamicParams(concept *gauge.Step, dataTableLookup *gauge.ArgLookup) error {
 	//If it is a top level concept
 	lookup, err := concept.Lookup.GetCopy()
@@ -203,9 +218,27 @@ func PopulateConceptDynamicParams(concept *gauge.Step, dataTableLookup *gauge.Ar
 				return err
 			}
 		}
+		if conceptLookupArg.ArgType == gauge.TableArg {
+			var updateColumns [][]gauge.TableCell
+			for _, cells := range conceptLookupArg.Table.Columns {
+				var updateCells []gauge.TableCell
+				for _, cell := range cells {
+					if cell.CellType == gauge.Dynamic {
+						v, err := dataTableLookup.GetArg(cell.Value)
+						if err != nil {
+							return err
+						}
+						updateCells = append(updateCells, gauge.TableCell{CellType: gauge.Static, Value: v.Value})
+					} else {
+						updateCells = append(updateCells, cell)
+					}
+				}
+				updateColumns = append(updateColumns, updateCells)
+			}
+			conceptLookupArg.Table.Columns = updateColumns
+		}
 	}
 	concept.Lookup = *lookup
-
 	//Updating values inside the concept step as well
 	newArgs := make([]*gauge.StepArg, 0)
 	for _, arg := range concept.Args {
@@ -230,4 +263,16 @@ func PopulateConceptDynamicParams(concept *gauge.Step, dataTableLookup *gauge.Ar
 	concept.Args = newArgs
 	concept.PopulateFragments()
 	return nil
+}
+
+// GetResolvedDataTablerows resolves any dynamic parameters in a table cell
+func GetResolvedDataTablerows(table gauge.Table) {
+	for i, cells := range table.Columns {
+		for j, cell := range cells {
+			if cell.CellType == gauge.SpecialString {
+				resolvedArg, _ := newSpecialTypeResolver().resolve(cell.Value)
+				table.Columns[i][j].Value = resolvedArg.Value
+			}
+		}
+	}
 }

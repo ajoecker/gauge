@@ -31,7 +31,6 @@ import (
 
 const (
 	gaugeRepositoryURL      = "gauge_repository_url"
-	gaugeUpdateURL          = "gauge_update_url"
 	gaugeTemplatesURL       = "gauge_templates_url"
 	runnerConnectionTimeout = "runner_connection_timeout"
 	pluginConnectionTimeout = "plugin_connection_timeout"
@@ -40,6 +39,7 @@ const (
 	ideRequestTimeout       = "ide_request_timeout"
 	checkUpdates            = "check_updates"
 	telemetryEnabled        = "gauge_telemetry_enabled"
+	telemetryConsent        = "gauge_telemetry_action_recorded"
 	telemetryLoggingEnabled = "gauge_telemetry_log_enabled"
 
 	defaultRunnerConnectionTimeout = time.Second * 25
@@ -106,11 +106,6 @@ func GaugeRepositoryUrl() string {
 	return getFromConfig(gaugeRepositoryURL)
 }
 
-// GaugeUpdateUrl fetches the URL to be used to check updates
-func GaugeUpdateUrl() string {
-	return getFromConfig(gaugeUpdateURL)
-}
-
 // GaugeTemplatesUrl fetches the URL to be used to download project templates
 func GaugeTemplatesUrl() string {
 	return getFromConfig(gaugeTemplatesURL)
@@ -129,6 +124,26 @@ func TelemetryEnabled() bool {
 func TelemetryLogEnabled() bool {
 	log := getFromConfig(telemetryLoggingEnabled)
 	return convertToBool(log, telemetryLoggingEnabled, false)
+}
+
+// TelemetryConsent determines if user has opted in/out of telemetry either via config or by setting
+// GAUGE_TELEMETRY_ENABLED environment variable
+func TelemetryConsent() bool {
+	e := os.Getenv(strings.ToUpper(telemetryEnabled))
+	if e != "" {
+		return true
+	}
+	consentVal := getFromConfig(telemetryConsent)
+	consent, err := strconv.ParseBool(strings.TrimSpace(consentVal))
+	if err != nil {
+		return false
+	}
+	return consent
+}
+
+// RecordTelemetryConsentSet records that user has opted in/out
+func RecordTelemetryConsentSet() {
+	Update(telemetryConsent, "true")
 }
 
 // SetProjectRoot sets project root location in ENV.

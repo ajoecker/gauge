@@ -24,7 +24,6 @@ import (
 	"runtime"
 	"syscall"
 
-	"strconv"
 	"strings"
 
 	"github.com/getgauge/common"
@@ -109,16 +108,6 @@ func SetWorkingDir(workingDir string) {
 	}
 }
 
-func ConvertToBool(value, property string, defaultValue bool) bool {
-	boolValue, err := strconv.ParseBool(strings.TrimSpace(value))
-	if err != nil {
-		logger.Warningf(true, "Incorrect value for %s in property file. Cannot convert %s to boolean.", property, value)
-		logger.Warningf(true, "Using default value %v for property %s.", defaultValue, property)
-		return defaultValue
-	}
-	return boolValue
-}
-
 // GetSpecDirs returns the specification directory.
 // It checks whether the environment variable for gauge_specs_dir is set.
 // It returns 'specs' otherwise
@@ -141,4 +130,8 @@ func ListContains(list []string, val string) bool {
 		}
 	}
 	return false
+}
+
+func GetFileContents(filepath string) (string, error) {
+	return common.ReadFileContents(GetPathToFile(filepath))
 }
